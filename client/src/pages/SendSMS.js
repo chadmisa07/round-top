@@ -35,7 +35,7 @@ function Form() {
       event.preventDefault();
 
       const params = { ...inputs };
-      await fetch("http://127.0.0.1:8000/sendSMS", {
+      await fetch(`http://${process.env.REACT_APP_DOMAIN}:8000/sendSMS`, {
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'

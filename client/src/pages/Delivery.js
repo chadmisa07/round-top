@@ -15,7 +15,7 @@ function Form() {
     const [data, setData] = useState([]);
 
     useEffect(() => {
-      fetch('http://127.0.0.1:8000/deliveryList')
+      fetch(`http://${process.env.REACT_APP_DOMAIN}:8000/deliveryList`)
       .then((res) => res.text())
       .then((data) => {
         console.log(JSON.parse(data));

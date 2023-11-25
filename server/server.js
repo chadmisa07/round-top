@@ -3,8 +3,10 @@ const cors = require("cors");
 const express = require("express");
 const mysql = require('mysql2');
 
-const accountSid = 'ACdeb7ff11afc99f3d43009a96b6b5b7a1';
-const authToken = 'd61107abbf2b1731d8e7417e3f3caeab';
+require("dotenv").config();
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
 const twilioClient = require('twilio')(accountSid, authToken);
 
 const app = express();
@@ -13,10 +15,10 @@ app.use(express.json());// receive form data
 // app.use(express.urlencoded({extended: true, limit: '1mb'}))
 
 const db = mysql.createConnection({
-    host     : 'localhost',
-    user     : 'root',
-    password : 'root',
-    database : 'bagels'
+    host     : process.env.DB_HOST,
+    user     : process.env.DB_USER,
+    password : process.env.DB_PASS,
+    database : process.env.DB_NAME
 })
 
 app.post("/subscribe", async (req, res) => {
@@ -48,14 +50,18 @@ app.get("/deliveryList", async (req, res) => {
   }
 });
 app.post("/sendSMS", async(req, res) => {  
-  const { phone_number, message } = req.body;
-  twilioClient.messages
-  .create({
-    body: message,
-    to: phone_number, // Text your number
-    from: '+15702216646', // From a valid Twilio number
-  })
-  .then((message) => console.log(message.sid));
+  try {
+    const { phone_number, message } = req.body;
+    twilioClient.messages
+    .create({
+      body: message,
+      to: phone_number, // Text your number
+      from: '+15702216646', // From a valid Twilio number
+    })
+    .then((message) => console.log(message.sid));
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 app.listen(8000, () => {

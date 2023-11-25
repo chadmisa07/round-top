@@ -34,7 +34,7 @@ function Form() {
       console.log(inputs);
       event.preventDefault();
 
-      const params = { ...inputs, message: postContent};
+      const params = { ...inputs };
       await fetch("http://127.0.0.1:8000/sendSMS", {
         headers: {
           'Accept': 'application/json',
@@ -122,7 +122,8 @@ function Form() {
                           <TextField fullWidth label="Phone Number" name="phone_number" color="secondary" onChange={handleChange} />
                         </Grid>
                         <Grid item>
-                          <Textarea value={postContent} fullWidth aria-label="Message" name="message" minRows={3} placeholder="Enter message..." onChange={e => setPostContent(e.target.value)} />
+                          <TextField fullWidth label="Message" name="message" color="secondary" onChange={handleChange} />
+                          {/* <Textarea value={postContent} fullWidth aria-label="Message" name="message" minRows={3} placeholder="Enter message..." onChange={e => setPostContent(e.target.value)} /> */}
                         </Grid>
                         <Grid item>
                           <Button type="submit" variant="contained">Send SMS</Button>

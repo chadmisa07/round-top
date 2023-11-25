@@ -7,18 +7,18 @@ import Delivery from './pages/Delivery';
 import SendSMS from './pages/SendSMS';
 import BroadcastSMS from './pages/BroadcastSMS';
 
-
-
 function App() {
 
   
   return (
-    <Router>
+    <Router basename={process.env.REACT_APP_BASENAME || null}>
       <Routes>
-        <Route exact path="/" element={<Form/>}/>        
-        <Route exact path="/delivery" element={<Delivery/>}/>        
-        <Route exact path="/sendSMS" element={<SendSMS/>}/>        
-        <Route exact path="/broadcastSMS" element={<BroadcastSMS/>}/>
+        <Route path="/">
+          <Route index element={<Form/>}/>
+          <Route exact path="/delivery" element={<Delivery/>}/>
+          <Route exact path="/sendSMS" element={<SendSMS/>}/>
+          <Route exact path="/broadcastSMS" element={<BroadcastSMS/>}/>
+        </Route>
       </Routes>
     </Router>
   );

@@ -21,7 +21,7 @@ const db = mysql.createConnection({
     database : process.env.DB_NAME
 })
 
-app.post('/sms', (req, res) => {
+app.post('/', (req, res) => {
   console.log(req);
   const twiml = new MessagingResponse();
 

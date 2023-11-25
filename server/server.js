@@ -29,6 +29,7 @@ app.post("/subscribe", async (req, res) => {
     await db.promise().query('INSERT INTO subscribers SET ?', user); 
     res.send({"message": 'Successfully subscribed! Stay tuned for more details.'});      
   } catch (err) { 
+    console.log(err);
     res.send({"message": 'Something went wrong, please consult with your provider!'});  
   }
   //  db.query('INSERT INTO subscribers SET ?', user, (err, output) => {

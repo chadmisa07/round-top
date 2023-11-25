@@ -30,16 +30,11 @@ app.post("/subscribe", async (req, res) => {
     res.send({"message": 'Successfully subscribed! Stay tuned for more details.'});      
   } catch (err) { 
     console.log(err);
-    res.send({"message": 'Something went wrong, please consult with your provider!'});  
+    if( err && err.code == "ER_DUP_ENTRY" )
+      res.send({"message": 'Phone Number is already subscribed. Stay tuned for updates!'});    
+    else
+      res.send({"message": 'Something went wrong, please consult with your provider!'});  
   }
-  //  db.query('INSERT INTO subscribers SET ?', user, (err, output) => {
-  //   if( err && err.code != "ER_DUP_ENTRY" ) 
-  //     throw err;
-  //   else if( err && err.code == "ER_DUP_ENTRY" )
-  //     res.send({"message": 'Something went wrong, please consult with your provider!'});    
-  //   else
-  //     res.send({"message":"yes!"});
-  // });
 });
 
 app.get("/deliveryList", async (req, res) => {

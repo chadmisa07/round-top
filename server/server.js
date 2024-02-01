@@ -166,6 +166,27 @@ app.post(
         // Then define and call a method to handle the subscription update.
         // handleSubscriptionUpdated(subscription);
         break;
+      case 'checkout.session.async_payment_failed':
+        const checkoutSessionAsyncPaymentFailed = event.data.object;
+        // Then define and call a function to handle the event checkout.session.async_payment_failed
+        break;
+      case 'checkout.session.async_payment_succeeded':
+        const checkoutSessionAsyncPaymentSucceeded = event.data.object;
+        // Then define and call a function to handle the event checkout.session.async_payment_succeeded
+        break;
+      case 'subscription_schedule.aborted':
+        const subscriptionScheduleAborted = event.data.object;
+        // Then define and call a function to handle the event subscription_schedule.aborted
+        break;
+      case 'subscription_schedule.canceled':
+        const subscriptionScheduleCanceled = event.data.object;
+        // Then define and call a function to handle the event subscription_schedule.canceled
+        break;
+      case 'subscription_schedule.expiring':
+        const subscriptionScheduleExpiring = event.data.object;
+        // Then define and call a function to handle the event subscription_schedule.expiring
+        break;
+      // ... handle other event types
       default:
         // Unexpected event type
         console.log(`Unhandled event type ${event.type}.`);

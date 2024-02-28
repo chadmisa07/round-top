@@ -9,7 +9,7 @@ import React, { useEffect, useState } from "react";
 // import Alert from "@mui/material/Alert";
 
 import { useParams, useNavigate } from "react-router-dom";
-
+import UnsubscribeModal from "../components/UnsubscribeModal";
 import Form from "../components/Form";
 
 function Subscribe(props) {
@@ -18,8 +18,13 @@ function Subscribe(props) {
   const { session_id } = params;
   const [inputs, setInputs] = useState({});
   const [subscriptionId, setSubscriptionId] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
+  const [showUnsubscribeModal, setShowUnsubscribeModal] = useState(false);
+
+  const doShowUnsubscribeModal = (value) => {
+    setShowUnsubscribeModal(value);
+  };
 
   // const { address, name, phone_number, postal_code, quantity, email } = inputs;
   const { quantity } = inputs;
@@ -99,7 +104,9 @@ function Subscribe(props) {
 
         const data = await res.json();
         if (data?.subscriptionId) {
-          setIsSuccess(true);
+          setSuccess(
+            "You have successfully subscribe to the bagels delivery weekly!"
+          );
           navigate("/");
         }
         setSubscriptionId(data.subscriptionId);
@@ -124,25 +131,43 @@ function Subscribe(props) {
   //   !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
   return (
-    <div className="relative px-10 py-5 bg-slate-200 min-h-screen flex justify-center flex-col">
-      <div className="bagels__container bg-white cv__container lg:max-w-4xl xl:max-w-5xl md:max-w-3xl px-4 md:px-0 md:mx-auto sm:w-1/2 w-full rounded-lg shadow-lg flex flex-col">
-        <div className="bagels-logo w-full flex justify-center">
-          <div className="bagels-logo__container p-6">
-            <img
-              src="https://goldbelly.imgix.net/uploads/merchant/main_image/1281/Zuckers-Merchant-Banner__.jpg"
-              alt="bagels"
-            />
-          </div>
-        </div>
-        <div className="bagels-form md:px-14 pb-6 px-6">
-          <div className="flex items-center flex-col">
-            <h1 className="font-semibold text-2xl">
-              Subscribe to <span className="font-bold">Bagels Round Top</span>
-              for a delivery
-            </h1>
-          </div>
+    <>
+      {showUnsubscribeModal ? (
+        <UnsubscribeModal
+          open={showUnsubscribeModal}
+          handleClose={() => doShowUnsubscribeModal(false)}
+          setSuccess={setSuccess}
+        />
+      ) : null}
 
-          {/* {isSuccess && (
+      <div className="relative px-10 py-5 bg-slate-200 min-h-screen flex justify-center flex-col">
+        <div className="bagels__container bg-white cv__container lg:max-w-4xl xl:max-w-5xl md:max-w-3xl px-4 md:px-0 md:mx-auto sm:w-1/2 w-full rounded-lg shadow-lg flex flex-col">
+          <div className="flex justify-end mr-8 mt-4 ">
+            <span
+              onClick={() => doShowUnsubscribeModal(true)}
+              className="cursor-pointer font-semibold text-sm text-[blue]"
+            >
+              Unsubscribe?
+            </span>
+          </div>
+          <div className="bagels-logo w-full flex justify-center">
+            <div className="bagels-logo__container p-6">
+              <img
+                src="https://goldbelly.imgix.net/uploads/merchant/main_image/1281/Zuckers-Merchant-Banner__.jpg"
+                alt="bagels"
+              />
+            </div>
+          </div>
+          <div className="bagels-form md:px-14 pb-6 px-6">
+            <div className="flex items-center flex-col">
+              <h1 className="font-semibold text-2xl">
+                Subscribe to{" "}
+                <span className="font-bold">Bagels Round Top&nbsp;</span>
+                for a delivery
+              </h1>
+            </div>
+
+            {/* {isSuccess && (
             <div className="my-4">
               <Alert severity="success">
                 <span className="font-semibold">
@@ -231,23 +256,23 @@ function Subscribe(props) {
             </form>
           </div> */}
 
-          <Form
-            submitForm={submitForm}
-            handleChange={handleChange}
-            // isDisabled={isDisabled}
-            initialState={inputs}
-            error={error}
-            isSuccess={isSuccess}
-          />
+            <Form
+              submitForm={submitForm}
+              handleChange={handleChange}
+              // isDisabled={isDisabled}
+              initialState={inputs}
+              error={error}
+              success={success}
+            />
+          </div>
         </div>
-      </div>
-
-      {/* <div className="my-4 flex justify-center">
+        {/* <div className="my-4 flex justify-center">
         <Button type="button" variant="contained" onClick={doCheckOut}>
           Testing Checkout
         </Button>
       </div> */}
-    </div>
+      </div>
+    </>
   );
 }
 

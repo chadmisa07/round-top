@@ -18,7 +18,7 @@ const Form = ({
   submitForm,
   handleChange,
   initialState,
-  isSuccess,
+  success,
   error,
   routes,
   isUpdate = false,
@@ -47,12 +47,10 @@ const Form = ({
 
   return (
     <div>
-      {isSuccess && (
+      {success && (
         <div className="my-4">
           <Alert severity="success">
-            <span className="font-semibold">
-              You have successfully subscribe to the bagels delivery weekly!
-            </span>
+            <span className="font-semibold">{success}</span>
           </Alert>
         </div>
       )}

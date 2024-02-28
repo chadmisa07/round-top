@@ -42,27 +42,47 @@ app.post("/", async (req, res) => {
         subscriber[0][0].subscription_id
       );
 
-      console.log(
-        "@@@@@@@@@@@@@ subscription.current_period_end >>>>>>>>>>>",
-        subscription.current_period_end
-      );
+      const ONE_DAY = 1 * 24 * 60 * 60;
 
       const updatedSubscription = await stripe.subscriptions.update(
         subscriber[0][0].subscription_id,
         {
           pause_collection: {
-            behavior: "keep_as_draft",
-            // Get the next payment date based on the current period end date
-            // resumes_at: utils.getNextDeliveryDate(
-            //   new Date(subscription.current_period_end * 1000)
-            //   // subscriber[0][0].delivery_day
-            // ),
-            resumes_at: new Date(subscription.current_period_end * 1000),
+            behavior: "void",
+            // Set resume date to be the current period end date + 1 day so that it will skip billing the current cycle
+            resumes_at: subscription.current_period_end + ONE_DAY,
           },
         }
       );
 
       return res.json(updatedSubscription);
+    }
+  } else if (req.body.response === "unsubscribe") {
+    const subscriber = await db
+      .promise()
+      .query("SELECT * FROM subscribers where phone_number = ?", [
+        req.body.phoneNumber,
+      ]);
+
+    if (subscriber[0].length === 0) {
+      return res.status(400).json({ errMessage: "Record not found" });
+    } else {
+      const subscription = await stripe.subscriptions.cancel(
+        subscriber[0][0].subscription_id
+      );
+
+      //SET subscriber status to inactive
+      await db
+        .promise()
+        .query("UPDATE subscribers SET status = ? WHERE id = ? ", [
+          2,
+          subscriber[0][0].id,
+        ]);
+
+      return res.status(200).json({
+        message:
+          "You have successfully applied for unsubscription. Please respond to the confirmation text message sent to your mobile number.",
+      });
     }
   }
 

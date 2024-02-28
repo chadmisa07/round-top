@@ -1,20 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Modal, Box } from "@mui/material";
 
 import Form from "./Form";
 import { compareObjects } from "../utils";
-
-const style = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "background.paper",
-  borderRadius: "4px",
-  boxShadow: 24,
-  p: 4,
-};
+import { modalStyle } from "./constants";
 
 const UserUpdateModal = ({
   open,
@@ -72,7 +61,7 @@ const UserUpdateModal = ({
       aria-describedby="modal-modal-description"
       className="relative"
     >
-      <Box sx={style}>
+      <Box sx={modalStyle}>
         <div>
           <Form
             submitForm={submitForm}

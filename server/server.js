@@ -72,7 +72,7 @@ app.post("/login", async (req, res) => {
     // generate access token
     const accessToken = generateToken(
       data,
-      process.env.JWT_ACCESS_SECRET,
+      process.env.JWT_ACCESS_SECRET_KEY,
       false
     );
 
@@ -116,7 +116,7 @@ app.post("/verifyToken", async (req, res) => {
   if (authHeader) {
     const accessToken = authHeader.split(" ")[1];
 
-    jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET, (err, user) => {
+    jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET_KEY, (err, user) => {
       if (err) {
         res.status(403).json({ errMessage: "Token is not valid!" });
       } else {
@@ -160,7 +160,7 @@ app.post("/logout", verify, async (req, res) => {
 
 //   jwt.verify(
 //     refreshToken,
-//     process.env.JWT_REFRESH_SECRET,
+//     process.env.JWT_REFRESH_SECRET_KEY,
 //     async (err, user) => {
 //       if (err) {
 //         return res.status(403).json({ errMessage: "Token is not valid!" });
@@ -174,12 +174,12 @@ app.post("/logout", verify, async (req, res) => {
 //       console.log("@@@@@@@@@@@@@ user >>>>>>>>>>>>>>", user);
 //       const newAccessToken = generateToken(
 //         user,
-//         process.env.JWT_ACCESS_SECRET,
+//         process.env.JWT_ACCESS_SECRET_KEY,
 //         false
 //       );
 //       const newRefreshToken = generateToken(
 //         user,
-//         process.env.JWT_REFRESH_SECRET
+//         process.env.JWT_REFRESH_SECRET_KEY
 //       );
 
 //       // insert new refresh token to the database
@@ -247,7 +247,7 @@ app.post("/subscribe", async (req, res) => {
   }
 });
 
-//
+// Used for updating the subscriber data
 app.post("/update-subscriber", async (req, res) => {
   const {
     name,
@@ -339,7 +339,7 @@ app.post("/update-subscriber", async (req, res) => {
     });
   } catch (err) {
     console.log("@@@@@@ error >>>>>>>>>>>>>>>>>", err);
-    res.status(400).send({
+    res.status(400).json({
       errMessage: "Something went wrong, please consult with your provider!",
     });
   }
@@ -382,7 +382,7 @@ app.post("/sendSMS", async (req, res) => {
       .create({
         body: message,
         to: phone_number, // Text your number
-        from: "+15702216646", // From a valid Twilio number
+        from: process.env.TWILIO_NUMBER, // From a valid Twilio number
       })
       .then((message) => console.log(message.sid));
   } catch (err) {
@@ -478,6 +478,32 @@ app.post("/set-subscription", async (req, res) => {
   } catch (error) {
     res.status(400).send({
       errMessage: "Something went wrong, please consult with your provider!",
+    });
+  }
+});
+
+// Used for client unsubscribe
+app.post("/unsubscribe", async (req, res) => {
+  const subscriber = await db
+    .promise()
+    .query("SELECT * FROM subscribers where phone_number = ?", [
+      req.body.phoneNumber,
+    ]);
+
+  if (subscriber[0].length === 0) {
+    res.status(400).json({ errMessage: "Phone number is incorrect." });
+  } else {
+    //SET subscriber status to unsubscribing and will go to inactive after responding unsubscribe to the text message
+    await db
+      .promise()
+      .query("UPDATE subscribers SET status = ? WHERE id = ? ", [
+        3,
+        subscriber[0][0].id,
+      ]);
+
+    res.status(200).json({
+      message:
+        "You have successfully applied for unsubscription. Please respond to the confirmation text message sent to your mobile number.",
     });
   }
 });

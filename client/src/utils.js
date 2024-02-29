@@ -19,16 +19,13 @@
 export const setToken = async (setIsLoading, doSetUser) => {
   const brtJWT = localStorage.getItem("brt-jwt");
   if (brtJWT) {
-    const verify = await fetch(
-      `http://${process.env.REACT_APP_DOMAIN}/verifyToken`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          authorization: `Bearer ${brtJWT}`,
-        },
-        method: "POST",
-      }
-    );
+    const verify = await fetch(`${process.env.REACT_APP_DOMAIN}/verifyToken`, {
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${brtJWT}`,
+      },
+      method: "POST",
+    });
     const verifyData = await verify.json();
     if (verifyData?.errMessage) {
       localStorage.removeItem("brt-jwt");

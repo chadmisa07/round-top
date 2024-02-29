@@ -28,7 +28,7 @@ const UserUpdateModal = ({
   const submitForm = async function (event) {
     event.preventDefault();
     setIsDisabled(true);
-    await fetch(`http://${process.env.REACT_APP_DOMAIN}/update-subscriber`, {
+    await fetch(`${process.env.REACT_APP_DOMAIN}/update-subscriber`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

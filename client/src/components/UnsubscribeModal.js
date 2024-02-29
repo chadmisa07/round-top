@@ -13,7 +13,7 @@ const UnsubscribeModal = ({ open, handleClose, setSuccess }) => {
   };
 
   const doUnsubscribe = async () => {
-    fetch(`http://${process.env.REACT_APP_DOMAIN}/unsubscribe`, {
+    fetch(`${process.env.REACT_APP_DOMAIN}/unsubscribe`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

@@ -16,7 +16,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const app = express();
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://34.152.38.199:3000"],
+    origin: [process.env.APP_DOMAIN],
   })
 );
 app.use(express.json()); // receive form data
@@ -24,7 +24,7 @@ app.use(express.json()); // receive form data
 app.use(express.static("public"));
 app.use(express.urlencoded({ extended: true }));
 
-const STRIPE_DOMAIN = `${process.env.DOMAIN}\bagels`;
+const STRIPE_DOMAIN = `${process.env.APP_DOMAIN}\bagels`;
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
@@ -415,6 +415,12 @@ app.post("/create-checkout-session", async (req, res) => {
 
     const currentDate = new Date();
     console.log("@@@@@@@@@@@@@@@ currentDate >>>>>>>>>>>>>>>", currentDate);
+    console.log(
+      "@@@@@@@@@@@@@@@ startDay >>>>>>>>>>>>>>>>>>",
+      utils.getStartDay(currentDate.getDay())
+    );
+    console.log("@@@@@@@@@@@@@@@ prices >>>>>>>>>>>>>>>>>>>>", prices);
+    console.log("@@@@@@@@@@@@@@@ customer >>>>>>>>>>>>>>>>>>", customer);
 
     const session = await stripe.checkout.sessions.create({
       customer: customer.id,
@@ -432,8 +438,8 @@ app.post("/create-checkout-session", async (req, res) => {
         proration_behavior: "none",
       },
       mode: "subscription",
-      success_url: `http://localhost:3000/{CHECKOUT_SESSION_ID}__${req.body.userId}`,
-      cancel_url: `http://localhost:3000/sendSMS`,
+      success_url: `${process.env.APP_DOMAIN}/{CHECKOUT_SESSION_ID}__${req.body.userId}`,
+      cancel_url: `${process.env.APP_DOMAIN}/sendSMS`,
     });
 
     if (session?.url) {
@@ -534,7 +540,7 @@ app.post("/create-portal-session", async (req, res) => {
 
   const portalSession = await stripe.billingPortal.sessions.create({
     customer: checkoutSession.customer,
-    return_url: `http://localhost:3000`,
+    return_url: process.env.APP_DOMAIN,
   });
 
   res.json({ url: portalSession.url });

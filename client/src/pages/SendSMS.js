@@ -33,7 +33,7 @@ function Form() {
     event.preventDefault();
 
     const params = { ...inputs };
-    await fetch(`http://${process.env.REACT_APP_DOMAIN}/sendSMS`, {
+    await fetch(`${process.env.REACT_APP_DOMAIN}/sendSMS`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

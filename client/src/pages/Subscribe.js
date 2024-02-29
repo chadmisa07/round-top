@@ -48,7 +48,7 @@ function Subscribe(props) {
 
   const doCheckOut = async (userId) => {
     const res = await fetch(
-      `http://${process.env.REACT_APP_DOMAIN}/create-checkout-session`,
+      `${process.env.REACT_APP_DOMAIN}/create-checkout-session`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -72,7 +72,7 @@ function Subscribe(props) {
 
   const submitForm = async function (event) {
     event.preventDefault();
-    await fetch(`http://${process.env.REACT_APP_DOMAIN}/subscribe`, {
+    await fetch(`${process.env.REACT_APP_DOMAIN}/subscribe`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -92,7 +92,7 @@ function Subscribe(props) {
     if (session_id && !subscriptionId) {
       const setSubscription = async () => {
         const res = await fetch(
-          `http://${process.env.REACT_APP_DOMAIN}/set-subscription`,
+          `${process.env.REACT_APP_DOMAIN}/set-subscription`,
           {
             headers: {
               "Content-Type": "application/json",

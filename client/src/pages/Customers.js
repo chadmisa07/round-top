@@ -20,14 +20,14 @@ function Form() {
   const [routes, setRoutes] = useState([]);
 
   const doFetchCustomers = () => {
-    fetch(`http://${process.env.REACT_APP_DOMAIN}/customers`)
+    fetch(`${process.env.REACT_APP_DOMAIN}/customers`)
       .then((res) => res.text())
       .then((data) => {
         setData(JSON.parse(data));
       })
       .catch((err) => console.log(err));
 
-    fetch(`http://${process.env.REACT_APP_DOMAIN}/routes`)
+    fetch(`${process.env.REACT_APP_DOMAIN}/routes`)
       .then((res) => res.json())
       .then((data) => {
         setRoutes(data);

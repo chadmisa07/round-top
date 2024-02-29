@@ -38,7 +38,7 @@ function Form() {
   const submitForm = async function (event) {
     console.log(inputs);
     event.preventDefault();
-    await fetch(`http://${process.env.REACT_APP_DOMAIN}/subscribe`, {
+    await fetch(`${process.env.REACT_APP_DOMAIN}/subscribe`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

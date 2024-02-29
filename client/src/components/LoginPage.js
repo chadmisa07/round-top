@@ -20,7 +20,7 @@ const LoginPage = ({ doSetUser }) => {
   };
 
   const doLogin = (inputs) => {
-    fetch(`http://${process.env.REACT_APP_DOMAIN}/login`, {
+    fetch(`${process.env.REACT_APP_DOMAIN}/login`, {
       headers: {
         "Content-Type": "application/json",
       },

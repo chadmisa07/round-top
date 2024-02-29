@@ -14,7 +14,7 @@ const utils = require("./utils");
 const { MessagingResponse } = require("twilio").twiml;
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: ["http://localhost:3000", process.env.APP_DOMAIN] }));
 app.use(express.json()); // receive form data
 // app.use(express.urlencoded({extended: true, limit: '1mb'}))
 

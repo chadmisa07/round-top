@@ -9,11 +9,8 @@ function getStartDay(currentDay = 1) {
   }
   let nextDelivery = new Date(today);
   nextDelivery.setDate(today.getDate() + daysUntilDeliveryDate); // Set date to the next delivery date
-  console.log(
-    "@@@@@@@@@@@@@@@@@@ nextMonday >>>>>>>>>>>>>>>>>>>>",
-    nextDelivery
-  );
-  return Math.floor(new Date(nextDelivery.setHours(9, 30, 0)).getTime() / 1000);
+
+  return Math.floor(new Date(nextDelivery.setHours(0, 0, 0)).getTime() / 1000);
 }
 
 // function getNextDeliveryDate(periodEnd) {

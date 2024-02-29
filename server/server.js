@@ -16,7 +16,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET);
 const app = express();
 app.use(
   cors({
-    origin: [process.env.APP_DOMAIN],
+    origin: ["http://localhost:3000", process.env.APP_DOMAIN],
   })
 );
 app.use(express.json()); // receive form data

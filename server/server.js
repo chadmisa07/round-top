@@ -353,7 +353,7 @@ app.get("/routes", async (req, res) => {
     let data = await db
       .promise()
       .query(
-        "SELECT routes.id, routes.name, CONCAT('Every ', day.description) as delivery_date_desc, routes.delivery_day FROM routes LEFT JOIN DAY ON routes.delivery_day = day.id"
+        "SELECT routes.id, routes.name, CONCAT('Every ', day.description) as delivery_date_desc, routes.delivery_day FROM routes LEFT JOIN day ON routes.delivery_day = day.id"
       );
     res.send(data[0]);
   } catch (err) {
@@ -414,6 +414,7 @@ app.post("/create-checkout-session", async (req, res) => {
     });
 
     const currentDate = new Date();
+    console.log("@@@@@@@@@@@@@@@ currentDate >>>>>>>>>>>>>>>", currentDate);
 
     const session = await stripe.checkout.sessions.create({
       customer: customer.id,

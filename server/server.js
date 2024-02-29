@@ -337,7 +337,6 @@ app.post("/update-subscriber", async (req, res) => {
       message: "Successfully updated subscriber data.",
     });
   } catch (err) {
-    console.log("@@@@@@ error >>>>>>>>>>>>>>>>>", err);
     res.status(400).json({
       errMessage: "Something went wrong, please consult with your provider!",
     });
@@ -410,13 +409,6 @@ app.post("/create-checkout-session", async (req, res) => {
     });
 
     const currentDate = new Date();
-    console.log("@@@@@@@@@@@@@@@ currentDate >>>>>>>>>>>>>>>", currentDate);
-    console.log(
-      "@@@@@@@@@@@@@@@ startDay >>>>>>>>>>>>>>>>>>",
-      utils.getStartDay(currentDate.getDay())
-    );
-    console.log("@@@@@@@@@@@@@@@ prices >>>>>>>>>>>>>>>>>>>>", prices);
-    console.log("@@@@@@@@@@@@@@@ customer >>>>>>>>>>>>>>>>>>", customer);
 
     const session = await stripe.checkout.sessions.create({
       customer: customer.id,
@@ -519,7 +511,6 @@ app.get("/retrieve-subscription", async (req, res) => {
   const { subscription_id } = req.query;
 
   const data = await stripe.invoices.list({ subscription: subscription_id });
-  console.log("@@@@@@@@@@@@@@@@@ data >>>>>>>>>>>>>>>>>", data.data.length);
   res.json({ data: data.data });
 });
 

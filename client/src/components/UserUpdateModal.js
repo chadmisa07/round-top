@@ -48,10 +48,6 @@ const UserUpdateModal = ({
   };
 
   const isDisabledUpdateButton = compareObjects(user, inputs) || isDisabled;
-  console.log(
-    "@@@@@ isDisabledUpdateButton >>>>>>>>>>>>",
-    isDisabledUpdateButton
-  );
 
   return (
     <Modal

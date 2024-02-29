@@ -82,7 +82,6 @@ function Subscribe(props) {
     })
       .then(async (res) => res.json())
       .then((data) => {
-        console.log("@@@@@@@@@@@@@@@ data >>>>>>>>>>>>>>", data);
         if (data?.userId) doCheckOut(data.userId);
         if (data?.errMessage) setError(data.errMessage);
       });

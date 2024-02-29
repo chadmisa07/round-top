@@ -32,7 +32,6 @@ const LoginPage = ({ doSetUser }) => {
         if (data?.errMessage) {
           setError(data.errMessage);
         } else {
-          console.log("@@@@@@@@@@@@@@@ data >>>>>>>>>>>>>>>", data);
           doSetUser(data);
           localStorage.setItem("brt-jwt", data.accessToken);
         }

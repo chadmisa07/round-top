@@ -10,6 +10,7 @@ const Menus = Object.freeze([
 function Sidebar() {
   const navigate = useNavigate();
   const { adminSection } = useParams();
+  const section = adminSection || "customer";
 
   const doClick = (link) => {
     navigate(link);
@@ -18,8 +19,7 @@ function Sidebar() {
   const menus = useMemo(
     () =>
       Menus.map((menu) => {
-        const activeClassName =
-          adminSection === menu.link ? "bg-slate-200" : "";
+        const activeClassName = section === menu.link ? "bg-slate-200" : "";
         return (
           <li
             key={menu.label}

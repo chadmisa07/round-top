@@ -19,8 +19,8 @@ const Icon = () => {
           y2="0.5"
           gradientUnits="objectBoundingBox"
         >
-          <stop offset="0" stop-color="#f0f"></stop>
-          <stop offset="1" stop-color="#0ff"></stop>
+          <stop offset="0" stopColor="#f0f"></stop>
+          <stop offset="1" stopColor="#0ff"></stop>
         </linearGradient>
       </defs>
       <g>

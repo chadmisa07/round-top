@@ -28,6 +28,7 @@ const db = mysql.createConnection({
 app.post("/", async (req, res) => {
   console.log(req.body);
   const twiml = new MessagingResponse();
+  console.log("@@@@@@@@@@@@@@ request >>>>>>>>>>>>>>>>>", req);
 
   if (req.body.response === "no") {
     //Get subscriber data based on contact number

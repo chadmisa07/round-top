@@ -14,7 +14,11 @@ const twilioClient = require("twilio")(accountSid, authToken);
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://34.152.38.199:3000"],
+  })
+);
 app.use(express.json()); // receive form data
 // app.use(express.urlencoded({extended: true, limit: '1mb'}))
 app.use(express.static("public"));
@@ -53,7 +57,6 @@ const generateToken = (user, secret, noExpiry = true) => {
 };
 
 app.post("/login", async (req, res) => {
-  // res.send("test");
   const { username, password } = req.body;
 
   const user = await db

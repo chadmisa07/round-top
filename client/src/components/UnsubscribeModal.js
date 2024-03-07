@@ -32,13 +32,7 @@ const UnsubscribeModal = ({ open, handleClose, setSuccess }) => {
   };
 
   return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-title"
-      aria-describedby="modal-description"
-      className="relative"
-    >
+    <Modal open={open} onClose={handleClose} className="relative">
       <Box sx={modalStyle}>
         <div className="my-4">
           <Alert severity="info">

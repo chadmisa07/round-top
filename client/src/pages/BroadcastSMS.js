@@ -1,44 +1,41 @@
-import { styled } from "@mui/material/styles";
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Paper from "@mui/material/Paper";
-import Grid from "@mui/material/Grid";
+import React, { useEffect, useState } from "react";
+import SuccessErrorMessage from "../components/SuccessErrorMessage";
+import { Button } from "@mui/material";
 
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-
-import FormControl from "@mui/material/FormControl";
-import TextField from "@mui/material/TextField";
-
-import React, { useState } from "react";
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: "center",
-  color: theme.palette.text.secondary,
-}));
+const DEFAULT_STATE = { route: "0", message: "" };
 
 function Form() {
-  const [inputs, setInputs] = useState({});
+  const [inputs, setInputs] = useState(DEFAULT_STATE);
+  const { route, message } = inputs;
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
   const handleChange = (event) => {
     const name = event.target.name;
     const value = event.target.value;
     setInputs((values) => ({ ...values, [name]: value }));
   };
 
-  const [quantity, setQuantity] = useState("");
-  const handleQtyChange = (event) => {
-    setQuantity(event.target.value);
-    handleChange(event);
+  const [routes, setRoutes] = useState([]);
+
+  const doFetchRoutes = () => {
+    fetch(`${process.env.REACT_APP_DOMAIN}/routes`)
+      .then((res) => res.json())
+      .then((data) => {
+        setRoutes(data);
+      })
+      .catch((err) => console.log(err));
   };
 
-  const submitForm = async function (event) {
+  useEffect(() => {
+    doFetchRoutes();
+  }, []);
+
+  const submitForm = (event) => {
     console.log(inputs);
     event.preventDefault();
-    await fetch(`${process.env.REACT_APP_DOMAIN}/subscribe`, {
+
+    fetch(`${process.env.REACT_APP_DOMAIN}/broadcast-sms`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -46,96 +43,67 @@ function Form() {
       method: "POST",
       body: JSON.stringify(inputs),
     })
-      .then(async (res) => res.text())
-      .then((data) => alert(JSON.parse(data).message))
+      .then(async (res) => res.json())
+      .then((data) => {
+        setInputs(DEFAULT_STATE);
+
+        if (data.errMessage) {
+          return setError(data.errMessage);
+        }
+
+        setSuccess(data.message);
+      })
       .catch((err) => console.log(err));
   };
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={3}>
-        <Grid item xs={3}></Grid>
-        <Grid item xs={6}>
-          <Item>
-            <img
-              width="100%"
-              src="https://goldbelly.imgix.net/uploads/merchant/main_image/1281/Zuckers-Merchant-Banner__.jpg"
-              alt="bagels"
-            />
-          </Item>
-        </Grid>
-        <Grid item xs={3}></Grid>
-      </Grid>
+    <div>
+      <div className="p-2 shadow-lg border rounded-md min-h-[500px]">
+        <div className="text-3xl p-2">Broastcast</div>
+        <hr className="mt-2" />
+        <div className="mt-14 flex justify-center items-center">
+          <div className="max-w-lg w-full">
+            <SuccessErrorMessage success={success} error={error} />
+            <div className="w-full flex">
+              <select
+                className="border rounded-sm w-full p-3 shadow-sm border-gray-300 text-gray-600"
+                name="route"
+                onChange={handleChange}
+                value={route}
+              >
+                <option value={0}>Please select a route</option>
+                {routes?.map((route) => (
+                  <option key={route.id} value={route.id}>
+                    {route.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="w-full flex mt-2">
+              <textarea
+                className="w-full border border-gray-300 p-3 text-gray-600 h-48 shadow-sm rounded-sm focus:outline-none"
+                cols="10"
+                name="message"
+                onChange={handleChange}
+                placeholder="Enter a message"
+                value={message}
+              ></textarea>
+            </div>
 
-      <Grid container spacing={3}>
-        <Grid item xs={4}></Grid>
-        <Grid item xs={4}>
-          <Item>
-            <form onSubmit={submitForm} method="POST">
-              <Grid container direction={"column"} spacing={2}>
-                <Grid item>
-                  <TextField
-                    fullWidth
-                    label="Name"
-                    name="name"
-                    color="secondary"
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item>
-                  <TextField
-                    fullWidth
-                    label="Address"
-                    name="address"
-                    color="secondary"
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item>
-                  <FormControl fullWidth>
-                    <InputLabel name="quantity-label">Quantity</InputLabel>
-                    <Select
-                      labelId="quantity-label"
-                      name="quantity"
-                      value={quantity}
-                      label="quantity"
-                      onChange={handleQtyChange}
-                    >
-                      <MenuItem value={6}>Pack of 6</MenuItem>
-                      <MenuItem value={12}>Pack of 12</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item>
-                  <TextField
-                    fullWidth
-                    label="Postal Code"
-                    name="postal_code"
-                    color="secondary"
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item>
-                  <TextField
-                    fullWidth
-                    label="Phone #"
-                    name="phone_number"
-                    color="secondary"
-                    onChange={handleChange}
-                  />
-                </Grid>
-                <Grid item>
-                  <Button type="submit" variant="contained">
-                    Subscribe
-                  </Button>
-                </Grid>
-              </Grid>
-            </form>
-          </Item>
-        </Grid>
-        <Grid item xs={4}></Grid>
-      </Grid>
-    </Box>
+            <div className="w-full flex mt-2 justify-end">
+              <Button
+                variant="contained"
+                className="py-1 px-3 rounded-sm shadow-sm text-white"
+                onClick={submitForm}
+                disabled={!route || !message}
+              >
+                Send
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 

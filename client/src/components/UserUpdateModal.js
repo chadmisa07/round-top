@@ -14,7 +14,7 @@ const UserUpdateModal = ({
 }) => {
   const [inputs, setInputs] = useState(user);
   const [error, setError] = useState("");
-  const [isDisabled, setIsDisabled] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (event) => {
     const name = event.target.name;
@@ -25,10 +25,10 @@ const UserUpdateModal = ({
     setInputs((values) => ({ ...values, [name]: value }));
   };
 
-  const submitForm = async function (event) {
+  const submitForm = (event) => {
     event.preventDefault();
-    setIsDisabled(true);
-    await fetch(`${process.env.REACT_APP_DOMAIN}/update-subscriber`, {
+    setIsSubmitting(true);
+    fetch(`${process.env.REACT_APP_DOMAIN}/update-subscriber`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -38,6 +38,7 @@ const UserUpdateModal = ({
     })
       .then(async (res) => res.json())
       .then((data) => {
+        doFetchCustomers();
         if (data?.errMessage) {
           setError(data.errMessage);
         } else {
@@ -47,12 +48,10 @@ const UserUpdateModal = ({
       });
   };
 
-  const isDisabledUpdateButton = compareObjects(user, inputs) || isDisabled;
-
   return (
     <Modal
       open={open}
-      onClose={handleClose} //
+      onClose={handleClose}
       aria-labelledby="modal-modal-title"
       aria-describedby="modal-modal-description"
       className="relative"
@@ -66,7 +65,7 @@ const UserUpdateModal = ({
             error={error}
             isSuccess={false}
             routes={routes}
-            isDisabledUpdateButton={isDisabledUpdateButton}
+            isSubmitting={isSubmitting}
             isUpdate
           />
         </div>

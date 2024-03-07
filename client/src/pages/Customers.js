@@ -13,11 +13,14 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 
 import UserUpdateModal from "../components/UserUpdateModal";
+import CancelModal from "../components/admin/CancelModal";
 
 function Form() {
   const [data, setData] = useState([]);
   const [user, setUser] = useState(null);
   const [routes, setRoutes] = useState([]);
+  const [isCancel, setIsCancel] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
 
   const doFetchCustomers = () => {
     fetch(`${process.env.REACT_APP_DOMAIN}/customers`)
@@ -41,16 +44,33 @@ function Form() {
 
   const doSetUser = (user) => setUser(user);
 
-  const handleClose = useCallback(() => setUser(null), []);
+  const handleCloseUpdateModal = useCallback(() => {
+    setUser(null);
+    setIsUpdate(false);
+  }, []);
+
+  const handleCloseCancelModal = useCallback(() => {
+    setUser(null);
+    setIsCancel(false);
+  }, []);
 
   return (
     <div>
-      {Boolean(user) ? (
+      {isUpdate ? (
         <UserUpdateModal
           user={user}
-          open={Boolean(user)}
-          handleClose={handleClose}
+          open={isUpdate}
+          handleClose={handleCloseUpdateModal}
           routes={routes}
+          doFetchCustomers={doFetchCustomers}
+        />
+      ) : null}
+
+      {isCancel ? (
+        <CancelModal
+          user={user}
+          open={isCancel}
+          handleClose={handleCloseCancelModal}
           doFetchCustomers={doFetchCustomers}
         />
       ) : null}
@@ -68,6 +88,7 @@ function Form() {
                   <TableRow>
                     <TableCell className="!font-semibold">Name</TableCell>
                     <TableCell className="!font-semibold">Phone #</TableCell>
+                    <TableCell className="!font-semibold">Status</TableCell>
                     <TableCell className="!font-semibold">
                       Postal Code
                     </TableCell>
@@ -97,6 +118,7 @@ function Form() {
                           {row.name}
                         </TableCell>
                         <TableCell size="small">{row.phone_number}</TableCell>
+                        <TableCell size="small">{row.status_desc}</TableCell>
                         <TableCell size="small">{row.postal_code}</TableCell>
                         <TableCell size="small">{row.address}</TableCell>
                         <TableCell size="small">{row.quantity}</TableCell>
@@ -105,13 +127,34 @@ function Form() {
                         </TableCell>
                         <TableCell size="small">{route?.name}</TableCell>
                         <TableCell size="small">
-                          <Button
-                            type="button"
-                            variant="contained"
-                            onClick={() => doSetUser(row)}
-                          >
-                            Update
-                          </Button>
+                          {row.status === 1 && (
+                            <Button
+                              type="button"
+                              variant="contained"
+                              onClick={() => {
+                                doSetUser(row);
+                                setIsUpdate(true);
+                              }}
+                            >
+                              Update
+                            </Button>
+                          )}
+
+                          {row.status !== 2 && (
+                            <span className="ml-2">
+                              <Button
+                                type="button"
+                                variant="contained"
+                                onClick={() => {
+                                  doSetUser(row);
+                                  setIsCancel(true);
+                                }}
+                                color="error"
+                              >
+                                Cancel
+                              </Button>
+                            </span>
+                          )}
                         </TableCell>
                       </TableRow>
                     );

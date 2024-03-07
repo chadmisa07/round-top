@@ -29,45 +29,74 @@ app.post("/", async (req, res) => {
   console.log(req.body);
   const twiml = new MessagingResponse();
   console.log("@@@@@@@@@@@@@@ request >>>>>>>>>>>>>>>>>", req);
+  console.log("@@@@@@@@@@@@@@ request.body >>>>>>>>>>>>>>>>>", req.body);
 
-  if (req.body.response === "no") {
+  if (req.body.Body.includes("no")) {
     //Get subscriber data based on contact number
     const subscriber = await db.promise().query(
       `SELECT subscribers.*, routes.delivery_day FROM subscribers
         LEFT JOIN routes ON routes.id = subscribers.route_id
-        WHERE phone_number="${req.body.phoneNumber}"`
+        WHERE phone_number="${req.body.From}"`
+    );
+
+    console.log(
+      "@@@@@@@@@@@@@@@@ subscriber[0][0].status >>>>>>>>>>>>>",
+      subscriber[0][0].status
     );
 
     if (subscriber[0].length) {
-      const subscription = await stripe.subscriptions.retrieve(
-        subscriber[0][0].subscription_id
-      );
+      if (subscriber[0][0].status === 3) {
+        const subscription = await stripe.subscriptions.retrieve(
+          subscriber[0][0].subscription_id
+        );
 
-      const ONE_DAY = 1 * 24 * 60 * 60;
+        const ONE_DAY = 1 * 24 * 60 * 60;
 
-      const updatedSubscription = await stripe.subscriptions.update(
-        subscriber[0][0].subscription_id,
-        {
-          pause_collection: {
-            behavior: "void",
-            // Set resume date to be the current period end date + 1 day so that it will skip billing the current cycle
-            resumes_at: subscription.current_period_end + ONE_DAY,
-          },
-        }
-      );
+        const updatedSubscription = await stripe.subscriptions.update(
+          subscriber[0][0].subscription_id,
+          {
+            pause_collection: {
+              behavior: "void",
+              // Set resume date to be the current period end date + 1 day so that it will skip billing the current cycle
+              resumes_at: subscription.current_period_end + ONE_DAY,
+            },
+          }
+        );
 
-      return res.json(updatedSubscription);
+        const message = {
+          body: req.body.Body,
+          user_id: subscriber[0][0].id,
+          date: new Date(),
+        };
+
+        //Save message data
+        await db.promise().query("INSERT INTO messages SET ?", message);
+
+        //Set status to inactive
+        await db
+          .promise()
+          .query(
+            `UPDATE subscribers SET status="2" WHERE phone_number="${req.body.From}"`
+          );
+
+        return res.json(updatedSubscription);
+      } else {
+        return res.status(400).json({
+          errMessage:
+            "Failed to unsubscribe. Please use the unsubscribe facility to continue.",
+        });
+      }
     }
-  } else if (req.body.response === "unsubscribe") {
+  } else if (req.body.Body.includes("unsubscribe")) {
     const subscriber = await db
       .promise()
       .query("SELECT * FROM subscribers where phone_number = ?", [
-        req.body.phoneNumber,
+        req.body.From,
       ]);
 
     if (subscriber[0].length === 0) {
       return res.status(400).json({ errMessage: "Record not found" });
-    } else {
+    } else if (subscriber[0][0].status === "3") {
       const subscription = await stripe.subscriptions.cancel(
         subscriber[0][0].subscription_id
       );
@@ -80,9 +109,23 @@ app.post("/", async (req, res) => {
           subscriber[0][0].id,
         ]);
 
+      const message = {
+        body: req.body.Body,
+        user_id: subscriber[0][0].id,
+        date: new Date(),
+      };
+
+      //Save message data
+      await db.promise().query("INSERT INTO messages SET ?", message);
+
       return res.status(200).json({
         message:
           "You have successfully applied for unsubscription. Please respond to the confirmation text message sent to your mobile number.",
+      });
+    } else if (subscriber[0][0].status !== "3") {
+      return res.status(400).json({
+        errMessage:
+          "Failed to unsubscribe. Please use the unsubscribe facility to continue.",
       });
     }
   }

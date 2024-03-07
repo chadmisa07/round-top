@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import LoginPage from "../components/LoginPage";
 import { setToken } from "../utils";
 import LoadingScreen from "../components/LoadingScreen";
-import Admin from "../components/Admin";
+import Admin from "../components/admin";
 
 const AdminPage = () => {
   const [user, setUser] = useState(null);
@@ -25,7 +25,7 @@ const AdminPage = () => {
     } else {
       setIsLoading(false);
     }
-  }, []);
+  }, [brtJWT]);
 
   return (
     <div>

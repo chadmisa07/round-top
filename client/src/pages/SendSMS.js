@@ -28,12 +28,12 @@ function Form() {
     setInputs((values) => ({ ...values, [name]: value }));
   };
 
-  const submitForm = async function (event) {
+  const submitForm = (event) => {
     console.log(inputs);
     event.preventDefault();
 
     const params = { ...inputs };
-    await fetch(`${process.env.REACT_APP_DOMAIN}/sendSMS`, {
+    fetch(`${process.env.REACT_APP_DOMAIN}/sendSMS`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",

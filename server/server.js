@@ -13,8 +13,40 @@ const twilioClient = require("twilio")(accountSid, authToken);
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
+const sendMessage = async (number, message) => {
+  try {
+    if (Array.isArray(number)) {
+      const results = await Promise.all(
+        number.map((num) =>
+          twilioClient.messages.create({
+            body: message,
+            to: num, // Text your number
+            from: process.env.TWILIO_NUMBER, // From a valid Twilio number
+          })
+        )
+      );
+    } else {
+      twilioClient.messages.create({
+        body: message,
+        to: number, // Text your number
+        from: process.env.TWILIO_NUMBER, // From a valid Twilio number
+      });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 const app = express();
-app.use(cors({ origin: ["http://localhost:3000", process.env.APP_DOMAIN] }));
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "http://127.0.0.1:3000",
+      process.env.APP_DOMAIN,
+    ],
+  })
+);
 app.use(express.json()); // receive form data
 // app.use(express.urlencoded({extended: true, limit: '1mb'}))
 app.use(express.static("public"));
@@ -51,6 +83,12 @@ const verify = (req, res, next) => {
 const generateToken = (user, secret, noExpiry = true) => {
   return jwt.sign(user, secret, noExpiry ? {} : { expiresIn: "2h" });
 };
+
+app.get("/", async (req, res) => {
+  console.log("@@@@@@@@@@@@@@ req >>>>>>>>>>>>>>", req);
+
+  res.json({ message: "connected" });
+});
 
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -279,7 +317,7 @@ app.post("/update-subscriber", async (req, res) => {
       .promise()
       .query("SELECT * FROM subscribers WHERE id = ?", [id]);
 
-    if (userData[0][0].route_id !== Number(route_id)) {
+    if (route_id && userData[0][0].route_id !== Number(route_id)) {
       // query route for the actual delivery_day data
       const route = await db
         .promise()
@@ -337,8 +375,9 @@ app.post("/update-subscriber", async (req, res) => {
       message: "Successfully updated subscriber data.",
     });
   } catch (err) {
+    console.log("@@@@@@@@@@@@ err >>>>>>>>>>>>>>>>>>>", err);
     res.status(400).json({
-      errMessage: "Something went wrong, please consult with your provider!",
+      errMessage: err,
     });
   }
 });
@@ -363,28 +402,71 @@ app.get("/customers", async (req, res) => {
   try {
     let data = await db
       .promise()
-      .query('SELECT * FROM subscribers WHERE status = "1" ORDER BY id DESC');
+      .query(
+        "SELECT subscribers.*, status.description as status_desc FROM subscribers as subscribers LEFT JOIN status ON status.id = subscribers.status ORDER BY id DESC"
+      );
     res.json(data[0]);
-  } catch (err) {
-    res.send({
-      message: "Something went wrong, please consult with your provider!",
+  } catch (error) {
+    res.status(400).json({
+      errMessage: error,
     });
   }
 });
 
 // Used for sending SMS
 app.post("/sendSMS", async (req, res) => {
+  const { phone_number, message } = req.body;
+
   try {
-    const { phone_number, message } = req.body;
-    twilioClient.messages
-      .create({
-        body: message,
-        to: phone_number, // Text your number
-        from: process.env.TWILIO_NUMBER, // From a valid Twilio number
-      })
-      .then((message) => console.log(message.sid));
-  } catch (err) {
-    console.log(err);
+    await sendMessage(phone_number, message);
+    res.status(200).json({
+      message: `You have successfully sent a message to ${phone_number}`,
+    });
+  } catch (error) {
+    res.status(400).json({ errMessage: error });
+  }
+
+  // try {
+  //   twilioClient.messages
+  //     .create({
+  //       body: message,
+  //       to: phone_number, // Text your number
+  //       from: process.env.TWILIO_NUMBER, // From a valid Twilio number
+  //     })
+  //     .then((message) => console.log(message.sid));
+  // } catch (err) {
+  //   console.log(err);
+  // }
+});
+
+// Used for broadcasting sms to all of the subscribers in a specific route
+app.post("/broadcast-sms", async (req, res) => {
+  const { route, message } = req.body;
+
+  const subscribers = await db
+    .promise()
+    .query("SELECT * FROM subscribers WHERE route_id = ? ORDER BY id DESC", [
+      route,
+    ]);
+
+  const routeData = await db
+    .promise()
+    .query("SELECT name FROM routes WHERE id = ?", [route]);
+
+  if (subscribers[0].length) {
+    try {
+      const numbers = await Promise.all(
+        subscribers[0].map((subscriber) => subscriber.phone_number)
+      );
+
+      await sendMessage(numbers, message);
+      res.status(200).json({
+        message: `You have successfully broadcast a text message to ${routeData[0][0].name}`,
+        route,
+      });
+    } catch (error) {
+      res.status(400).json({ errMessage: error });
+    }
   }
 });
 
@@ -437,6 +519,24 @@ app.post("/create-checkout-session", async (req, res) => {
     res.status(400).send({
       errMessage: err,
     });
+  }
+});
+
+// Used for cancel subscription
+app.post("/cancel-subscription", async (req, res) => {
+  try {
+    console.log("@@@@@@ req >>>>>>>>>>>>>>>", req.body);
+    await stripe.subscriptions.cancel(req.body.subscriptionId);
+    //SET subscription_id of the newly subscribed user
+    db.promise().query("UPDATE subscribers SET status='2' where id= ? ", [
+      req.body.id,
+    ]);
+
+    res
+      .status(200)
+      .json({ message: "Customer subscription is successfully cancelled." });
+  } catch (error) {
+    res.status(400).json({ errMessage: error });
   }
 });
 

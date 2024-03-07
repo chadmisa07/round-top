@@ -14,6 +14,8 @@ const PACKS = [
   { value: 12, label: "Pack of 12" },
 ];
 
+const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 const Form = ({
   submitForm,
   handleChange,
@@ -23,6 +25,7 @@ const Form = ({
   routes,
   isUpdate = false,
   isDisabledUpdateButton,
+  isSubmitting,
 }) => {
   const {
     address,
@@ -34,16 +37,14 @@ const Form = ({
     route_id,
   } = initialState;
 
-  let isDisabled =
+  const isDisabled =
     !address ||
     !name ||
     !phone_number ||
     !postal_code ||
     !quantity ||
-    !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
-
-  // disable the update button on update modal if its value has not changed
-  if (isUpdate) isDisabled = isDisabled || isDisabledUpdateButton;
+    !emailPattern.test(email) ||
+    isSubmitting;
 
   return (
     <div>

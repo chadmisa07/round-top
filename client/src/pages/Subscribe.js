@@ -12,7 +12,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import UnsubscribeModal from "../components/UnsubscribeModal";
 import Form from "../components/Form";
 
-function Subscribe(props) {
+const Subscribe = () => {
   const params = useParams();
   const navigate = useNavigate();
   const { session_id } = params;
@@ -21,6 +21,7 @@ function Subscribe(props) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [showUnsubscribeModal, setShowUnsubscribeModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const doShowUnsubscribeModal = (value) => {
     setShowUnsubscribeModal(value);
@@ -38,13 +39,6 @@ function Subscribe(props) {
 
     setInputs((values) => ({ ...values, [name]: value }));
   };
-
-  // const [quantity, setQuantity] = useState("");
-
-  // const handleQtyChange = (event) => {
-  //   setQuantity(event.target.value);
-  //   handleChange(event);
-  // };
 
   const doCheckOut = async (userId) => {
     const res = await fetch(
@@ -70,9 +64,10 @@ function Subscribe(props) {
     if (body?.errMessage) setError(body.errMessage);
   };
 
-  const submitForm = async function (event) {
+  const submitForm = (event) => {
     event.preventDefault();
-    await fetch(`${process.env.REACT_APP_DOMAIN}/subscribe`, {
+    setIsSubmitting(true);
+    fetch(`${process.env.REACT_APP_DOMAIN}/subscribe`, {
       headers: {
         Accept: "application/json",
         "Content-Type": "application/json",
@@ -114,20 +109,8 @@ function Subscribe(props) {
       setSubscription();
     }
 
-    // if (session_id) {
-    //   setIsSuccess(true);
-    //   navigate("/");
-    // }
     // eslint-disable-next-line react-hooks/exhaustive-deps, react-hooks/exhaustive-deps
   }, [session_id]);
-
-  // const isDisabled =
-  //   !address ||
-  //   !name ||
-  //   !phone_number ||
-  //   !postal_code ||
-  //   !quantity ||
-  //   !/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email);
 
   return (
     <>
@@ -166,113 +149,19 @@ function Subscribe(props) {
               </h1>
             </div>
 
-            {/* {isSuccess && (
-            <div className="my-4">
-              <Alert severity="success">
-                <span className="font-semibold">
-                  You have successfully subscribe to the bagels delivery weekly!
-                </span>
-              </Alert>
-            </div>
-          )}
-
-          {error && (
-            <div className="my-4">
-              <Alert severity="error">
-                <span className="font-semibold">{error}</span>
-              </Alert>
-            </div>
-          )}
-
-          <div>
-            <form onSubmit={submitForm} method="POST">
-              <div className="my-4">
-                <TextField
-                  fullWidth
-                  label="Name"
-                  name="name"
-                  color="secondary"
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="my-4">
-                <TextField
-                  fullWidth
-                  label="Address"
-                  name="address"
-                  color="secondary"
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="my-4">
-                <FormControl fullWidth>
-                  <InputLabel name="quantity-label">Quantity</InputLabel>
-                  <Select
-                    labelId="quantity-label"
-                    name="quantity"
-                    label="quantity"
-                    onChange={handleChange}
-                  >
-                    <MenuItem value={6}>Pack of 6</MenuItem>
-                    <MenuItem value={12}>Pack of 12</MenuItem>
-                  </Select>
-                </FormControl>
-              </div>
-              <div className="my-4">
-                <TextField
-                  fullWidth
-                  label="Postal Code"
-                  name="postal_code"
-                  color="secondary"
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="my-4">
-                <TextField
-                  fullWidth
-                  label="Phone #"
-                  name="phone_number"
-                  color="secondary"
-                  onChange={handleChange}
-                  value={phone_number}
-                />
-              </div>
-              <div className="my-4">
-                <TextField
-                  fullWidth
-                  label="Email"
-                  name="email"
-                  color="secondary"
-                  onChange={handleChange}
-                  value={email}
-                />
-              </div>
-              <div className="my-4 flex justify-center">
-                <Button type="submit" variant="contained" disabled={isDisabled}>
-                  Subscribe
-                </Button>
-              </div>
-            </form>
-          </div> */}
-
             <Form
               submitForm={submitForm}
               handleChange={handleChange}
-              // isDisabled={isDisabled}
+              isSubmitting={isSubmitting}
               initialState={inputs}
               error={error}
               success={success}
             />
           </div>
         </div>
-        {/* <div className="my-4 flex justify-center">
-        <Button type="button" variant="contained" onClick={doCheckOut}>
-          Testing Checkout
-        </Button>
-      </div> */}
       </div>
     </>
   );
-}
+};
 
 export default Subscribe;

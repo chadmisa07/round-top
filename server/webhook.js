@@ -16,7 +16,7 @@ const { MessagingResponse } = require("twilio").twiml;
 const app = express();
 app.use(cors({ origin: ["http://localhost:3000", process.env.APP_DOMAIN] }));
 app.use(express.json()); // receive form data
-// app.use(express.urlencoded({extended: true, limit: '1mb'}))
+app.use(express.urlencoded({ extended: true }));
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST,

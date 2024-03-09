@@ -31,12 +31,14 @@ app.post("/", async (req, res) => {
   console.log("@@@@@@@@@@@@@@ request >>>>>>>>>>>>>>>>>", req);
   console.log("@@@@@@@@@@@@@@ request.body >>>>>>>>>>>>>>>>>", req.body);
 
-  if (req.body.Body.includes("no")) {
+  const { Body, From, MessageSid } = req.body;
+
+  if (req?.body?.Body?.toLowerCase().includes("no")) {
     //Get subscriber data based on contact number
     const subscriber = await db.promise().query(
       `SELECT subscribers.*, routes.delivery_day FROM subscribers
         LEFT JOIN routes ON routes.id = subscribers.route_id
-        WHERE phone_number="${req.body.From}"`
+        WHERE phone_number="${From}"`
     );
 
     console.log(
@@ -64,8 +66,9 @@ app.post("/", async (req, res) => {
         );
 
         const message = {
-          body: req.body.Body,
+          body: Body,
           user_id: subscriber[0][0].id,
+          sms_id: MessageSid,
           date: new Date(),
         };
 
@@ -76,7 +79,7 @@ app.post("/", async (req, res) => {
         await db
           .promise()
           .query(
-            `UPDATE subscribers SET status="2" WHERE phone_number="${req.body.From}"`
+            `UPDATE subscribers SET status="2" WHERE phone_number="${From}"`
           );
 
         return res.json(updatedSubscription);
@@ -87,7 +90,7 @@ app.post("/", async (req, res) => {
         });
       }
     }
-  } else if (req.body.Body.includes("unsubscribe")) {
+  } else if (Body.toLowerCase().includes("unsubscribe")) {
     const subscriber = await db
       .promise()
       .query("SELECT * FROM subscribers where phone_number = ?", [
@@ -110,8 +113,9 @@ app.post("/", async (req, res) => {
         ]);
 
       const message = {
-        body: req.body.Body,
+        body: Body,
         user_id: subscriber[0][0].id,
+        sms_id: MessageSid,
         date: new Date(),
       };
 

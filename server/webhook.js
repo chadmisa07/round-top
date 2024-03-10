@@ -82,12 +82,9 @@ app.post("/", async (req, res) => {
             `UPDATE subscribers SET status="2" WHERE phone_number="${From}"`
           );
 
-        return res.json(updatedSubscription);
-      } else {
-        return res.status(400).json({
-          errMessage:
-            "Failed to unsubscribe. Please use the unsubscribe facility to continue.",
-        });
+        twiml.message(
+          "We've received your refusal of the delivery for this week. We'll be in touch next week to arrange another delivery. Thank you, and stay safe.\n\nWarm regards,\nYour Bagels Round Top Family"
+        );
       }
     }
   } else if (Body.toLowerCase().includes("unsubscribe")) {
@@ -122,19 +119,17 @@ app.post("/", async (req, res) => {
       //Save message data
       await db.promise().query("INSERT INTO messages SET ?", message);
 
-      return res.status(200).json({
-        message:
-          "You have successfully applied for unsubscription. Please respond to the confirmation text message sent to your mobile number.",
-      });
+      twiml.message(
+        "You have successfully unsubscribed from our delivery subscription service. We're sorry to see you go, but we respect your decision. If you ever wish to re-subscribe or have any questions, feel free to reach out to our customer support team. Thank you for being a part of our service.\n\nBagels Round Top"
+      );
     } else if (subscriber[0][0].status !== "3") {
-      return res.status(400).json({
-        errMessage:
-          "Failed to unsubscribe. Please use the unsubscribe facility to continue.",
-      });
+      twiml.message(
+        "Failed to unsubscribe. Please use the unsubscribe facility to continue."
+      );
     }
+  } else {
+    twiml.message("The Robots are coming! Head for the hills!");
   }
-
-  twiml.message("The Robots are coming! Head for the hills!");
 
   res.type("text/xml").send(twiml.toString());
 });

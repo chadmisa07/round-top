@@ -35,7 +35,7 @@ const Subscribe = () => {
     const name = event.target.name;
     const value = event.target.value;
 
-    if (name === "phone_number" && value && !/^[+0-9]+$/.test(value)) return;
+    if (name === "phone_number" && value && !/^\+\d+$/.test(value)) return;
 
     setInputs((values) => ({ ...values, [name]: value }));
   };

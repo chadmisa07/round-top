@@ -47,45 +47,43 @@ app.post("/", async (req, res) => {
     );
 
     if (subscriber[0].length) {
-      if (subscriber[0][0].status === 3) {
-        const subscription = await stripe.subscriptions.retrieve(
-          subscriber[0][0].subscription_id
-        );
+      const subscription = await stripe.subscriptions.retrieve(
+        subscriber[0][0].subscription_id
+      );
 
-        const ONE_DAY = 1 * 24 * 60 * 60;
+      const ONE_DAY = 1 * 24 * 60 * 60;
 
-        const updatedSubscription = await stripe.subscriptions.update(
-          subscriber[0][0].subscription_id,
-          {
-            pause_collection: {
-              behavior: "void",
-              // Set resume date to be the current period end date + 1 day so that it will skip billing the current cycle
-              resumes_at: subscription.current_period_end + ONE_DAY,
-            },
-          }
-        );
+      const updatedSubscription = await stripe.subscriptions.update(
+        subscriber[0][0].subscription_id,
+        {
+          pause_collection: {
+            behavior: "void",
+            // Set resume date to be the current period end date + 1 day so that it will skip billing the current cycle
+            resumes_at: subscription.current_period_end + ONE_DAY,
+          },
+        }
+      );
 
-        const message = {
-          body: Body,
-          user_id: subscriber[0][0].id,
-          sms_id: MessageSid,
-          date: new Date(),
-        };
+      const message = {
+        body: Body,
+        user_id: subscriber[0][0].id,
+        sms_id: MessageSid,
+        date: new Date(),
+      };
 
-        //Save message data
-        await db.promise().query("INSERT INTO messages SET ?", message);
+      //Save message data
+      await db.promise().query("INSERT INTO messages SET ?", message);
 
-        //Set status to inactive
-        await db
-          .promise()
-          .query(
-            `UPDATE subscribers SET status="2" WHERE phone_number="${From}"`
-          );
+      //Set status to inactive
+      // await db
+      //   .promise()
+      //   .query(
+      //     `UPDATE subscribers SET status="2" WHERE phone_number="${From}"`
+      //   );
 
-        twiml.message(
-          "We've received your refusal of the delivery for this week. We'll be in touch next week to arrange another delivery. Thank you, and stay safe.\n\nWarm regards,\nYour Bagels Round Top Family"
-        );
-      }
+      twiml.message(
+        "We've received your refusal of the delivery for this week. We'll be in touch next week to arrange another delivery. Thank you, and stay safe.\n\nWarm regards,\nYour Bagels Round Top Family"
+      );
     }
   } else if (Body.toLowerCase().includes("unsubscribe")) {
     const subscriber = await db

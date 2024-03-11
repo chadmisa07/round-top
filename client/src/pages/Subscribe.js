@@ -133,14 +133,6 @@ const Subscribe = () => {
 
       <div className="relative px-10 py-5 bg-slate-200 min-h-screen flex justify-center flex-col">
         <div className="bagels__container bg-white cv__container lg:max-w-4xl xl:max-w-5xl md:max-w-3xl px-4 md:px-0 md:mx-auto sm:w-1/2 w-full rounded-lg shadow-lg flex flex-col">
-          <div className="flex justify-end mr-8 mt-4 ">
-            <span
-              onClick={() => doShowUnsubscribeModal(true)}
-              className="cursor-pointer font-semibold text-sm text-[blue]"
-            >
-              Unsubscribe?
-            </span>
-          </div>
           <div className="bagels-logo w-full flex justify-center">
             <div className="bagels-logo__container p-6">
               <img
@@ -166,6 +158,20 @@ const Subscribe = () => {
               error={error}
               success={success}
             />
+          </div>
+          <div className="flex ml-8 my-4 ">
+            <div className="flex justify-center">
+              <span className="text-sm">
+                Do you wish to&nbsp;
+                <span
+                  onClick={() => doShowUnsubscribeModal(true)}
+                  className="cursor-pointer font-semibold text-[blue]"
+                >
+                  unsubscribe
+                </span>
+                ?
+              </span>
+            </div>
           </div>
         </div>
       </div>

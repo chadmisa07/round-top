@@ -58,7 +58,7 @@ function Form() {
 
   return (
     <div>
-      <div className="p-2 shadow-lg border rounded-md min-h-[500px]">
+      <div className="p-2 shadow-lg border rounded-md pb-6">
         <div className="text-3xl p-2">Broastcast</div>
         <hr className="mt-2" />
         <div className="mt-14 flex justify-center items-center">

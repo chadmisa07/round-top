@@ -4,17 +4,12 @@ import { useParams } from "react-router-dom";
 import DashboardLayout from "./Layout";
 
 import Customers from "../../pages/Customers";
-import SendSMS from "../../pages/SendSMS";
 import BroadcastSMS from "../../pages/BroadcastSMS";
 
 const PAGES = Object.freeze([
   {
     link: "customer",
     component: Customers,
-  },
-  {
-    link: "sms",
-    component: SendSMS,
   },
   {
     link: "broadcast",

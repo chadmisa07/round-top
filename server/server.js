@@ -469,6 +469,10 @@ app.post("/broadcast-sms", async (req, res) => {
     } catch (error) {
       res.status(400).json({ errMessage: error });
     }
+  } else {
+    res.status(400).json({
+      errMessage: "No subscribers in this route.",
+    });
   }
 });
 

@@ -47,8 +47,18 @@ const UnsubscribeModal = ({ open, handleClose, setSuccess }) => {
           </div>
         ) : null}
 
-        <div className="my-6">
+        <div className="my-6 flex justify-center w-full">
+          <div className="max-w-11">
+            <TextField
+              className="country-code"
+              fullWidth
+              color="secondary"
+              value={process.env.REACT_APP_DEFAULT_AREA_CODE}
+              disabled
+            />
+          </div>
           <TextField
+            className="phone-number"
             fullWidth
             label="Phone #"
             name="phone_number"

@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 
 const Menus = Object.freeze([
   { label: "Customer", link: "customer" },
-  { label: "SMS", link: "sms" },
   { label: "Broadcast", link: "broadcast" },
 ]);
 

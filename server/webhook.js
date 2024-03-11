@@ -29,7 +29,6 @@ app.post("/", async (req, res) => {
   console.log(req.body);
   const twiml = new MessagingResponse();
   console.log("@@@@@@@@@@@@@@ request >>>>>>>>>>>>>>>>>", req);
-  console.log("@@@@@@@@@@@@@@ request.body >>>>>>>>>>>>>>>>>", req.body);
 
   const { Body, From, MessageSid } = req.body;
 
@@ -82,7 +81,7 @@ app.post("/", async (req, res) => {
       //   );
 
       twiml.message(
-        "We've received your refusal of the delivery for this week. We'll be in touch next week to arrange another delivery. Thank you, and stay safe.\n\nWarm regards,\nYour Bagels Round Top Family"
+        "We've received your refusal of the delivery for this week. We'll be in touch next week to arrange another delivery. Thank you, and stay safe.\n\nThanks,\nBagels Round Top"
       );
     }
   } else if (Body.toLowerCase().includes("unsubscribe")) {

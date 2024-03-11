@@ -20,7 +20,7 @@ const UserUpdateModal = ({
     const name = event.target.name;
     const value = event.target.value;
 
-    if (name === "phone_number" && value && !/^\+\d+$/.test(value)) return;
+    if (name === "phone_number" && value && !/^[0-9]+$/.test(value)) return;
 
     setInputs((values) => ({ ...values, [name]: value }));
   };
@@ -34,7 +34,10 @@ const UserUpdateModal = ({
         "Content-Type": "application/json",
       },
       method: "POST",
-      body: JSON.stringify(inputs),
+      body: JSON.stringify({
+        ...inputs,
+        phone_number: `${process.env.REACT_APP_DEFAULT_AREA_CODE}${inputs.phone_number}`,
+      }),
     })
       .then(async (res) => res.json())
       .then((data) => {

@@ -40,11 +40,7 @@ const sendMessage = async (number, message) => {
 const app = express();
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://127.0.0.1:3000",
-      process.env.APP_DOMAIN,
-    ],
+    origin: [process.env.APP_DOMAIN],
   })
 );
 app.use(express.json()); // receive form data
@@ -247,7 +243,7 @@ app.delete("/delete/:userId", verify, (req, res) => {
 });
 
 app.post("/subscribe", async (req, res) => {
-  const { name, address, phone_number, postal_code, quantity, email } =
+  const { name, address, phone_number, postal_code, quantity, email, city } =
     req.body;
 
   const user = {
@@ -256,6 +252,7 @@ app.post("/subscribe", async (req, res) => {
     phone_number,
     postal_code,
     quantity,
+    city,
     status: 1,
     created_date: new Date(),
     email,
@@ -265,6 +262,11 @@ app.post("/subscribe", async (req, res) => {
     const data = await db
       .promise()
       .query("INSERT INTO subscribers SET ?", user);
+
+    await sendMessage(
+      phone_number,
+      "You have successfully subscribed to Bagels Round Top delivery. We'll be in touch with you regarding your delivery.\n\nThanks,\nBagels Round Top"
+    );
 
     res.send({
       message: "Successfully subscribed! Stay tuned for more details.",

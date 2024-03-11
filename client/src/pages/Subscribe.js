@@ -16,7 +16,15 @@ const Subscribe = () => {
   const params = useParams();
   const navigate = useNavigate();
   const { session_id } = params;
-  const [inputs, setInputs] = useState({});
+  const [inputs, setInputs] = useState({
+    city: "",
+    address: "",
+    name: "",
+    phone_number: "",
+    postal_code: "",
+    quantity: "",
+    email: "",
+  });
   const [subscriptionId, setSubscriptionId] = useState("");
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
@@ -27,15 +35,13 @@ const Subscribe = () => {
     setShowUnsubscribeModal(value);
   };
 
-  // const { address, name, phone_number, postal_code, quantity, email } = inputs;
   const { quantity } = inputs;
 
-  // const [clientSecret, setClientSecret] = useState("");
   const handleChange = (event) => {
     const name = event.target.name;
     const value = event.target.value;
 
-    if (name === "phone_number" && value && !/^\+\d+$/.test(value)) return;
+    if (name === "phone_number" && value && !/^[0-9]+$/.test(value)) return;
 
     setInputs((values) => ({ ...values, [name]: value }));
   };
@@ -73,7 +79,10 @@ const Subscribe = () => {
         "Content-Type": "application/json",
       },
       method: "POST",
-      body: JSON.stringify(inputs),
+      body: JSON.stringify({
+        ...inputs,
+        phone_number: `${process.env.REACT_APP_DEFAULT_AREA_CODE}${inputs.phone_number}`,
+      }),
     })
       .then(async (res) => res.json())
       .then((data) => {

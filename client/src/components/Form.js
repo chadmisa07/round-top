@@ -28,6 +28,7 @@ const Form = ({
   isSubmitting,
 }) => {
   const {
+    city,
     address,
     name,
     phone_number,
@@ -38,6 +39,7 @@ const Form = ({
   } = initialState;
 
   const isDisabled =
+    !city ||
     !address ||
     !name ||
     !phone_number ||
@@ -78,6 +80,16 @@ const Form = ({
           <div className="my-4">
             <TextField
               fullWidth
+              label="City"
+              name="city"
+              color="secondary"
+              onChange={handleChange}
+              value={city}
+            />
+          </div>
+          <div className="my-4">
+            <TextField
+              fullWidth
               label="Address"
               name="address"
               color="secondary"
@@ -113,8 +125,18 @@ const Form = ({
               value={postal_code}
             />
           </div>
-          <div className="my-4">
+          <div className="my-4 flex justify-center w-full">
+            <div className="max-w-11">
+              <TextField
+                className="country-code"
+                fullWidth
+                color="secondary"
+                value={process.env.REACT_APP_DEFAULT_AREA_CODE}
+                disabled
+              />
+            </div>
             <TextField
+              className="phone-number"
               fullWidth
               label="Phone #"
               name="phone_number"

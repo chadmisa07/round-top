@@ -76,10 +76,10 @@ app.post("/", async (req, res) => {
 
       const message =
         "We've received your refusal of the delivery for this week. We'll be in touch next week to arrange another delivery. Thank you, and stay safe.\n\nThanks,\nBagels Round Top";
-      twiml.message(message);
 
       //Save message data
       await saveMessage(message, From, To, MessageSid);
+      twiml.message(message);
     }
   } else if (Body.toLowerCase().includes("unsubscribe")) {
     const subscriber = await db
@@ -108,10 +108,10 @@ app.post("/", async (req, res) => {
 
       const message =
         "You have successfully unsubscribed from our delivery subscription service. We're sorry to see you go, but we respect your decision. If you ever wish to re-subscribe or have any questions, feel free to reach out to our customer support team. Thank you for being a part of our service.\n\nBagels Round Top";
-      twiml.message(message);
 
       //Save message data
       await saveMessage(Body, From, To, MessageSid);
+      twiml.message(message);
     } else if (subscriber[0][0].status !== "3") {
       twiml.message(
         "Failed to unsubscribe. Please use the unsubscribe facility to continue."

@@ -13,24 +13,55 @@ const twilioClient = require("twilio")(accountSid, authToken);
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
+const saveMessage = async (body, from, to, sid) => {
+  const messageParams = {
+    body,
+    to,
+    from,
+    sms_id: sid,
+    date: new Date(),
+  };
+
+  //Save message data
+  await db.promise().query("INSERT INTO messages SET ?", messageParams);
+};
+
 const sendMessage = async (number, message) => {
   try {
     if (Array.isArray(number)) {
       const results = await Promise.all(
-        number.map((num) =>
-          twilioClient.messages.create({
-            body: message,
-            to: num, // Text your number
-            from: process.env.TWILIO_NUMBER, // From a valid Twilio number
-          })
-        )
+        number.map((num) => {
+          twilioClient.messages
+            .create({
+              body: message,
+              to: num, // Text your number
+              from: process.env.TWILIO_NUMBER, // From a valid Twilio number
+            })
+            .then(async (response) => {
+              await saveMessage(
+                message,
+                process.env.TWILIO_NUMBER,
+                num,
+                response.sid
+              );
+            });
+        })
       );
     } else {
-      twilioClient.messages.create({
-        body: message,
-        to: number, // Text your number
-        from: process.env.TWILIO_NUMBER, // From a valid Twilio number
-      });
+      twilioClient.messages
+        .create({
+          body: message,
+          to: number, // Text your number
+          from: process.env.TWILIO_NUMBER, // From a valid Twilio number
+        })
+        .then(async (response) => {
+          await saveMessage(
+            message,
+            process.env.TWILIO_NUMBER,
+            number,
+            response.sid
+          );
+        });
     }
   } catch (err) {
     console.log(err);
@@ -81,8 +112,6 @@ const generateToken = (user, secret, noExpiry = true) => {
 };
 
 app.get("/", async (req, res) => {
-  console.log("@@@@@@@@@@@@@@ req >>>>>>>>>>>>>>", req);
-
   res.json({ message: "connected" });
 });
 
@@ -263,11 +292,6 @@ app.post("/subscribe", async (req, res) => {
       .promise()
       .query("INSERT INTO subscribers SET ?", user);
 
-    await sendMessage(
-      phone_number,
-      "You have successfully subscribed to Bagels Round Top delivery. We'll be in touch with you regarding your delivery.\n\nThanks,\nBagels Round Top"
-    );
-
     res.send({
       message: "Successfully subscribed! Stay tuned for more details.",
       userId: data[0].insertId,
@@ -377,7 +401,6 @@ app.post("/update-subscriber", async (req, res) => {
       message: "Successfully updated subscriber data.",
     });
   } catch (err) {
-    console.log("@@@@@@@@@@@@ err >>>>>>>>>>>>>>>>>>>", err);
     res.status(400).json({
       errMessage: err,
     });
@@ -575,7 +598,17 @@ app.post("/set-subscription", async (req, res) => {
 
     //SET subscription_id of the newly subscribed user
     db.promise().query(
-      `UPDATE subscribers SET subscription_id="${data.subscription}", customer_id="${data.customer}" where id="${user_id}"`
+      "UPDATE subscribers SET subscription_id= ? , customer_id= ? where id= ?",
+      [data.subscription, data.customer, user_id]
+    );
+
+    const subscriber = await db
+      .promise()
+      .query("SELECT * FROM subscribers where id = ?", [user_id]);
+
+    await sendMessage(
+      subscriber[0][0].phone_number,
+      "You have successfully subscribed to Bagels Round Top delivery. We'll be in touch with you regarding your delivery.\n\nThanks,\nBagels Round Top"
     );
 
     res.json({ subscriptionId: data.subscription });
@@ -726,6 +759,8 @@ app.post(
     response.send();
   }
 );
+
+module.exports = { saveMessage };
 
 app.listen(8000, () => {
   console.log(`Server is running on port 8000.`);

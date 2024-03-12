@@ -77,7 +77,6 @@ function Form() {
 
       <Box sx={{ paddingTop: 2, flexGrow: 1 }}>
         <Grid container spacing={3}>
-          {/* <Grid item xs={1}></Grid> */}
           <Grid item xs={12}>
             <TableContainer component={Paper}>
               <Typography variant="h4" className="pl-4 pt-4">
@@ -163,7 +162,6 @@ function Form() {
               </Table>
             </TableContainer>
           </Grid>
-          {/* <Grid item xs={1}></Grid> */}
         </Grid>
       </Box>
     </div>

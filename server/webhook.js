@@ -10,6 +10,7 @@ const twilioClient = require("twilio")(accountSid, authToken);
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const utils = require("./utils");
+const { saveMessage } = require("./server");
 
 const { MessagingResponse } = require("twilio").twiml;
 
@@ -30,7 +31,7 @@ app.post("/", async (req, res) => {
   const twiml = new MessagingResponse();
   console.log("@@@@@@@@@@@@@@ request >>>>>>>>>>>>>>>>>", req);
 
-  const { Body, From, MessageSid } = req.body;
+  const { Body, From, MessageSid, To } = req.body;
 
   if (req?.body?.Body?.toLowerCase().includes("no")) {
     //Get subscriber data based on contact number
@@ -63,15 +64,8 @@ app.post("/", async (req, res) => {
         }
       );
 
-      const message = {
-        body: Body,
-        user_id: subscriber[0][0].id,
-        sms_id: MessageSid,
-        date: new Date(),
-      };
-
       //Save message data
-      await db.promise().query("INSERT INTO messages SET ?", message);
+      await saveMessage(Body, From, To, MessageSid);
 
       //Set status to inactive
       // await db
@@ -80,9 +74,12 @@ app.post("/", async (req, res) => {
       //     `UPDATE subscribers SET status="2" WHERE phone_number="${From}"`
       //   );
 
-      twiml.message(
-        "We've received your refusal of the delivery for this week. We'll be in touch next week to arrange another delivery. Thank you, and stay safe.\n\nThanks,\nBagels Round Top"
-      );
+      const message =
+        "We've received your refusal of the delivery for this week. We'll be in touch next week to arrange another delivery. Thank you, and stay safe.\n\nThanks,\nBagels Round Top";
+      twiml.message(message);
+
+      //Save message data
+      await saveMessage(message, From, To, MessageSid);
     }
   } else if (Body.toLowerCase().includes("unsubscribe")) {
     const subscriber = await db
@@ -106,19 +103,15 @@ app.post("/", async (req, res) => {
           subscriber[0][0].id,
         ]);
 
-      const message = {
-        body: Body,
-        user_id: subscriber[0][0].id,
-        sms_id: MessageSid,
-        date: new Date(),
-      };
+      //Save message data
+      await saveMessage(Body, From, To, MessageSid);
+
+      const message =
+        "You have successfully unsubscribed from our delivery subscription service. We're sorry to see you go, but we respect your decision. If you ever wish to re-subscribe or have any questions, feel free to reach out to our customer support team. Thank you for being a part of our service.\n\nBagels Round Top";
+      twiml.message(message);
 
       //Save message data
-      await db.promise().query("INSERT INTO messages SET ?", message);
-
-      twiml.message(
-        "You have successfully unsubscribed from our delivery subscription service. We're sorry to see you go, but we respect your decision. If you ever wish to re-subscribe or have any questions, feel free to reach out to our customer support team. Thank you for being a part of our service.\n\nBagels Round Top"
-      );
+      await saveMessage(Body, From, To, MessageSid);
     } else if (subscriber[0][0].status !== "3") {
       twiml.message(
         "Failed to unsubscribe. Please use the unsubscribe facility to continue."

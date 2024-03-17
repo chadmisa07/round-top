@@ -24,7 +24,7 @@ function Form() {
       .then((data) => {
         setRoutes(data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => setError(JSON.stringify(err)));
   };
 
   useEffect(() => {
@@ -53,7 +53,7 @@ function Form() {
 
         setSuccess(data.message);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => setError(JSON.stringify(err)));
   };
 
   return (

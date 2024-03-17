@@ -1,11 +1,11 @@
 import { Alert } from "@mui/material";
 import React from "react";
 
-const SuccessErrorMessage = ({ success, error }) => {
+const SuccessErrorMessage = ({ success, error, containerClassName }) => {
   return (
     <>
       {success && (
-        <div className="my-4">
+        <div className={containerClassName || "my-4"}>
           <Alert severity="success">
             <span className="font-semibold">{success}</span>
           </Alert>
@@ -13,7 +13,7 @@ const SuccessErrorMessage = ({ success, error }) => {
       )}
 
       {error && (
-        <div className="my-4">
+        <div className={containerClassName || "my-4"}>
           <Alert severity="error">
             <span className="font-semibold">{error}</span>
           </Alert>

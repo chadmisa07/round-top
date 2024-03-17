@@ -125,15 +125,18 @@ const Form = ({
               value={postal_code}
             />
           </div>
-          <div className="my-4 flex justify-center w-full">
+          <div className="my-4 flex justify-center w-full items-center">
             <div className="max-w-11">
-              <TextField
+              <div className="flex justify-center items-center border px-2 py-[15px] border-gray-300 rounded-l-[4px] bg-gray-200">
+                {process.env.REACT_APP_DEFAULT_AREA_CODE}
+              </div>
+              {/* <TextField
                 className="country-code"
                 fullWidth
                 color="secondary"
                 value={process.env.REACT_APP_DEFAULT_AREA_CODE}
                 disabled
-              />
+              /> */}
             </div>
             <TextField
               className="phone-number"

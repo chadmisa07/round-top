@@ -14,6 +14,7 @@ import Grid from "@mui/material/Grid";
 
 import UserUpdateModal from "../components/UserUpdateModal";
 import CancelModal from "../components/admin/CancelModal";
+import SuccessErrorMessage from "../components/SuccessErrorMessage";
 
 function Form() {
   const [data, setData] = useState([]);
@@ -21,6 +22,7 @@ function Form() {
   const [routes, setRoutes] = useState([]);
   const [isCancel, setIsCancel] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
+  const [error, setError] = useState(null);
 
   const doFetchCustomers = () => {
     fetch(`${process.env.REACT_APP_DOMAIN}/customers`)
@@ -28,14 +30,14 @@ function Form() {
       .then((data) => {
         setData(JSON.parse(data));
       })
-      .catch((err) => console.log(err));
+      .catch((err) => setError(JSON.stringify(err)));
 
     fetch(`${process.env.REACT_APP_DOMAIN}/routes`)
       .then((res) => res.json())
       .then((data) => {
         setRoutes(data);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => setError(JSON.stringify(err)));
   };
 
   useEffect(() => {
@@ -78,6 +80,7 @@ function Form() {
       <Box sx={{ paddingTop: 2, flexGrow: 1 }}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
+            <SuccessErrorMessage error={error} containerClassName="mt-0 mb-2" />
             <TableContainer component={Paper}>
               <Typography variant="h4" className="pl-4 pt-4">
                 Customer List

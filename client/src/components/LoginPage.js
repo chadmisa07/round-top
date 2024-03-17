@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert } from "@mui/material";
+import SuccessErrorMessage from "./SuccessErrorMessage";
 
 const LoginPage = ({ doSetUser }) => {
   const [inputs, setInputs] = useState({});
@@ -34,7 +34,7 @@ const LoginPage = ({ doSetUser }) => {
           localStorage.setItem("brt-jwt", data.accessToken);
         }
       })
-      .catch((err) => console.log(err));
+      .catch((err) => setError(JSON.stringify(err)));
   };
 
   return (
@@ -45,13 +45,7 @@ const LoginPage = ({ doSetUser }) => {
             Sign in to admin
           </h2>
         </div>
-        {error && (
-          <div className="my-4">
-            <Alert severity="error">
-              <span className="font-semibold">{error}</span>
-            </Alert>
-          </div>
-        )}
+        <SuccessErrorMessage error={error} />
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <input type="hidden" name="remember" value="true" />
           <div className="rounded-md shadow-sm -space-y-px">

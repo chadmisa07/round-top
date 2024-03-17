@@ -15,7 +15,7 @@ const { saveMessage } = require("./server");
 const { MessagingResponse } = require("twilio").twiml;
 
 const app = express();
-app.use(cors({ origin: ["http://localhost:3000", process.env.APP_DOMAIN] }));
+app.use(cors({ origin: [process.env.APP_DOMAIN] }));
 app.use(express.json()); // receive form data
 app.use(express.urlencoded({ extended: true }));
 
@@ -24,6 +24,10 @@ const db = mysql.createConnection({
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
+});
+
+app.get("/", async (req, res) => {
+  res.json({ message: "connected" });
 });
 
 app.post("/", async (req, res) => {

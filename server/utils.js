@@ -47,7 +47,21 @@ async function encryptPassword(password) {
   return encryptedPassword;
 }
 
+const saveMessage = async (body, from, to, sid, db) => {
+  const messageParams = {
+    body,
+    to,
+    from,
+    sms_id: sid,
+    date: new Date(),
+  };
+
+  //Save message data
+  await db.promise().query("INSERT INTO messages SET ?", messageParams);
+};
+
 module.exports = {
   getStartDay,
   getNextDeliveryDate,
+  saveMessage,
 };

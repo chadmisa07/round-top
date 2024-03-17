@@ -13,19 +13,6 @@ const twilioClient = require("twilio")(accountSid, authToken);
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
-const saveMessage = async (body, from, to, sid) => {
-  const messageParams = {
-    body,
-    to,
-    from,
-    sms_id: sid,
-    date: new Date(),
-  };
-
-  //Save message data
-  await db.promise().query("INSERT INTO messages SET ?", messageParams);
-};
-
 const sendMessage = async (number, message) => {
   try {
     if (Array.isArray(number)) {
@@ -38,11 +25,12 @@ const sendMessage = async (number, message) => {
               from: process.env.TWILIO_NUMBER, // From a valid Twilio number
             })
             .then(async (response) => {
-              await saveMessage(
+              await utils.saveMessage(
                 message,
                 process.env.TWILIO_NUMBER,
                 num,
-                response.sid
+                response.sid,
+                db
               );
             });
         })
@@ -55,11 +43,12 @@ const sendMessage = async (number, message) => {
           from: process.env.TWILIO_NUMBER, // From a valid Twilio number
         })
         .then(async (response) => {
-          await saveMessage(
+          await utils.saveMessage(
             message,
             process.env.TWILIO_NUMBER,
             number,
-            response.sid
+            response.sid,
+            db
           );
         });
     }
@@ -759,8 +748,6 @@ app.post(
     response.send();
   }
 );
-
-module.exports = { saveMessage };
 
 app.listen(8000, () => {
   console.log(`Server is running on port 8000.`);

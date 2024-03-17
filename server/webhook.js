@@ -10,7 +10,6 @@ const twilioClient = require("twilio")(accountSid, authToken);
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
 const utils = require("./utils");
-const { saveMessage } = require("./server");
 
 const { MessagingResponse } = require("twilio").twiml;
 
@@ -69,7 +68,7 @@ app.post("/", async (req, res) => {
       );
 
       //Save message data
-      await saveMessage(Body, From, To, MessageSid);
+      await utils.saveMessage(Body, From, To, MessageSid, db);
 
       //Set status to inactive
       // await db
@@ -82,7 +81,7 @@ app.post("/", async (req, res) => {
         "We've received your refusal of the delivery for this week. We'll be in touch next week to arrange another delivery. Thank you, and stay safe.\n\nThanks,\nBagels Round Top";
 
       //Save message data
-      await saveMessage(message, From, To, MessageSid);
+      await utils.saveMessage(message, From, To, MessageSid, db);
       twiml.message(message);
     }
   } else if (Body.toLowerCase().includes("unsubscribe")) {
@@ -108,13 +107,13 @@ app.post("/", async (req, res) => {
         ]);
 
       //Save message data
-      await saveMessage(Body, From, To, MessageSid);
+      await utils.saveMessage(Body, From, To, MessageSid, db);
 
       const message =
         "You have successfully unsubscribed from our delivery subscription service. We're sorry to see you go, but we respect your decision. If you ever wish to re-subscribe or have any questions, feel free to reach out to our customer support team. Thank you for being a part of our service.\n\nBagels Round Top";
 
       //Save message data
-      await saveMessage(Body, From, To, MessageSid);
+      await utils.saveMessage(Body, From, To, MessageSid, db);
       twiml.message(message);
     } else if (subscriber[0][0].status !== "3") {
       twiml.message(

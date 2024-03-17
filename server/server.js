@@ -71,7 +71,7 @@ const sendMessage = async (number, message) => {
 const app = express();
 app.use(
   cors({
-    origin: [process.env.APP_DOMAIN],
+    origin: ["https://bagelsroundtop.com", "https://www.bagelsroundtop.com"],
   })
 );
 app.use(express.json()); // receive form data

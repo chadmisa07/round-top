@@ -13,6 +13,9 @@ const twilioClient = require("twilio")(accountSid, authToken);
 
 const stripe = require("stripe")(process.env.STRIPE_SECRET);
 
+const DEFAULT_ERROR_MESSAGE =
+  "Something went wrong, please consult with your provider!";
+
 const sendMessage = async (number, message) => {
   try {
     if (Array.isArray(number)) {
@@ -60,7 +63,10 @@ const sendMessage = async (number, message) => {
 const app = express();
 app.use(
   cors({
-    origin: ["https://bagelsroundtop.com", "https://www.bagelsroundtop.com"],
+    origin: [
+      "https://bagelsroundtop.csubsom",
+      "https://www.bagelsroundtop.com",
+    ],
   })
 );
 app.use(express.json()); // receive form data
@@ -293,7 +299,7 @@ app.post("/subscribe", async (req, res) => {
       });
     } else {
       res.status(400).send({
-        errMessage: "Something went wrong, please consult with your provider!",
+        errMessage: DEFAULT_ERROR_MESSAGE,
       });
     }
   }
@@ -391,7 +397,7 @@ app.post("/update-subscriber", async (req, res) => {
     });
   } catch (err) {
     res.status(400).json({
-      errMessage: err,
+      errMessage: DEFAULT_ERROR_MESSAGE,
     });
   }
 });
@@ -406,7 +412,7 @@ app.get("/routes", async (req, res) => {
     res.send(data[0]);
   } catch (err) {
     res.send({
-      message: "Something went wrong, please consult with your provider!",
+      message: DEFAULT_ERROR_MESSAGE,
     });
   }
 });
@@ -422,7 +428,7 @@ app.get("/customers", async (req, res) => {
     res.json(data[0]);
   } catch (error) {
     res.status(400).json({
-      errMessage: error,
+      errMessage: DEFAULT_ERROR_MESSAGE,
     });
   }
 });
@@ -437,7 +443,7 @@ app.post("/sendSMS", async (req, res) => {
       message: `You have successfully sent a message to ${phone_number}`,
     });
   } catch (error) {
-    res.status(400).json({ errMessage: error });
+    res.status(400).json({ errMessage: DEFAULT_ERROR_MESSAGE });
   }
 
   // try {
@@ -479,7 +485,7 @@ app.post("/broadcast-sms", async (req, res) => {
         route,
       });
     } catch (error) {
-      res.status(400).json({ errMessage: error });
+      res.status(400).json({ errMessage: DEFAULT_ERROR_MESSAGE });
     }
   } else {
     res.status(400).json({
@@ -535,7 +541,7 @@ app.post("/create-checkout-session", async (req, res) => {
     }
   } catch (err) {
     res.status(400).send({
-      errMessage: err,
+      errMessage: DEFAULT_ERROR_MESSAGE,
     });
   }
 });
@@ -554,7 +560,7 @@ app.post("/cancel-subscription", async (req, res) => {
       .status(200)
       .json({ message: "Customer subscription is successfully cancelled." });
   } catch (error) {
-    res.status(400).json({ errMessage: error });
+    res.status(400).json({ errMessage: DEFAULT_ERROR_MESSAGE });
   }
 });
 
@@ -571,7 +577,7 @@ app.post("/pause-subscription", async (req, res) => {
     res.status(200).json({ message: "Subscription successfully paused!" });
   } catch (error) {
     res.status(400).send({
-      errMessage: "Something went wrong, please consult with your provider!",
+      errMessage: DEFAULT_ERROR_MESSAGE,
     });
   }
 });
@@ -603,7 +609,7 @@ app.post("/set-subscription", async (req, res) => {
     res.json({ subscriptionId: data.subscription });
   } catch (error) {
     res.status(400).send({
-      errMessage: "Something went wrong, please consult with your provider!",
+      errMessage: DEFAULT_ERROR_MESSAGE,
     });
   }
 });

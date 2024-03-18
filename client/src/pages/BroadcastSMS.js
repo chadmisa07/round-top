@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import SuccessErrorMessage from "../components/SuccessErrorMessage";
+import Alert from "../components/Alert";
 import { Button } from "@mui/material";
 
 const DEFAULT_STATE = { route: "0", message: "" };
@@ -9,6 +9,7 @@ function Form() {
   const { route, message } = inputs;
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (event) => {
     const name = event.target.name;
@@ -34,7 +35,7 @@ function Form() {
   const submitForm = (event) => {
     console.log(inputs);
     event.preventDefault();
-
+    setLoading(true);
     fetch(`${process.env.REACT_APP_DOMAIN}/broadcast-sms`, {
       headers: {
         Accept: "application/json",
@@ -47,6 +48,7 @@ function Form() {
       .then((data) => {
         setInputs(DEFAULT_STATE);
 
+        setLoading(false);
         if (data.errMessage) {
           return setError(data.errMessage);
         }
@@ -63,7 +65,11 @@ function Form() {
         <hr className="mt-2" />
         <div className="mt-14 flex justify-center items-center">
           <div className="max-w-lg w-full">
-            <SuccessErrorMessage success={success} error={error} />
+            <Alert
+              success={success}
+              error={error}
+              loading={loading ? "Broadcasting message to customers." : ""}
+            />
             <div className="w-full flex">
               <select
                 className="border rounded-sm w-full p-3 shadow-sm border-gray-300 text-gray-600"

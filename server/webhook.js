@@ -36,7 +36,7 @@ app.post("/", async (req, res) => {
 
   const { Body, From, MessageSid, To } = req.body;
 
-  if (req?.body?.Body?.toLowerCase().includes("no")) {
+  if (req?.body?.Body?.toLowerCase().includes("cancel delivery")) {
     //Get subscriber data based on contact number
     const subscriber = await db.promise().query(
       `SELECT subscribers.*, routes.delivery_day FROM subscribers

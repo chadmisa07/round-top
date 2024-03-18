@@ -14,7 +14,7 @@ import Grid from "@mui/material/Grid";
 
 import UserUpdateModal from "../components/UserUpdateModal";
 import CancelModal from "../components/admin/CancelModal";
-import SuccessErrorMessage from "../components/SuccessErrorMessage";
+import Alert from "../components/Alert";
 
 function Form() {
   const [data, setData] = useState([]);
@@ -80,7 +80,7 @@ function Form() {
       <Box sx={{ paddingTop: 2, flexGrow: 1 }}>
         <Grid container spacing={3}>
           <Grid item xs={12}>
-            <SuccessErrorMessage error={error} containerClassName="mt-0 mb-2" />
+            <Alert error={error} containerClassName="mt-0 mb-2" />
             <TableContainer component={Paper}>
               <Typography variant="h4" className="pl-4 pt-4">
                 Customer List

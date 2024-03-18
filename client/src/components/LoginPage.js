@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import SuccessErrorMessage from "./SuccessErrorMessage";
+import Alert from "./Alert";
 
 const LoginPage = ({ doSetUser }) => {
   const [inputs, setInputs] = useState({});
@@ -45,7 +45,7 @@ const LoginPage = ({ doSetUser }) => {
             Sign in to admin
           </h2>
         </div>
-        <SuccessErrorMessage error={error} />
+        <Alert error={error} />
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <input type="hidden" name="remember" value="true" />
           <div className="rounded-md shadow-sm -space-y-px">

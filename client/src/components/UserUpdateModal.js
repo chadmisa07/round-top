@@ -12,7 +12,15 @@ const UserUpdateModal = ({
   routes,
   doFetchCustomers,
 }) => {
-  const [inputs, setInputs] = useState(user);
+  const phone_number = user.phone_number.replace(
+    new RegExp(`^\\${process.env.REACT_APP_DEFAULT_AREA_CODE}`),
+    ""
+  );
+
+  const [inputs, setInputs] = useState({
+    ...user,
+    phone_number,
+  });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 

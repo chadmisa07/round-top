@@ -63,10 +63,7 @@ const sendMessage = async (number, message) => {
 const app = express();
 app.use(
   cors({
-    origin: [
-      "https://bagelsroundtop.csubsom",
-      "https://www.bagelsroundtop.com",
-    ],
+    origin: ["https://bagelsroundtop.com", "https://www.bagelsroundtop.com"],
   })
 );
 app.use(express.json()); // receive form data

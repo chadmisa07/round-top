@@ -63,7 +63,11 @@ const sendMessage = async (number, message) => {
 const app = express();
 app.use(
   cors({
-    origin: ["https://bagelsroundtop.com", "https://www.bagelsroundtop.com"],
+    origin: [
+      "https://bagelsroundtop.com",
+      "https://www.bagelsroundtop.com",
+      "http://localhost:3000",
+    ],
   })
 );
 app.use(express.json()); // receive form data
@@ -85,8 +89,7 @@ const verify = (req, res, next) => {
 
   if (authHeader) {
     const token = authHeader.split(" ")[1];
-
-    jwt.verify(token, process.env.JWT_ACCESS_SECRET, (err, user) => {
+    jwt.verify(token, process.env.JWT_ACCESS_SECRET_KEY, (err, user) => {
       if (err) {
         return res.status(403).json({ errMessage: "Token is not valid!" });
       }
@@ -264,12 +267,21 @@ app.delete("/delete/:userId", verify, (req, res) => {
 });
 
 app.post("/subscribe", async (req, res) => {
-  const { name, address, phone_number, postal_code, quantity, email, city } =
-    req.body;
+  const {
+    name,
+    phone_number,
+    postal_code,
+    quantity,
+    email,
+    city,
+    accept_alert,
+    street,
+    number,
+    apartment,
+  } = req.body;
 
   const user = {
     name,
-    address,
     phone_number,
     postal_code,
     quantity,
@@ -277,6 +289,10 @@ app.post("/subscribe", async (req, res) => {
     status: 1,
     created_date: new Date(),
     email,
+    accept_alert,
+    street,
+    number,
+    apartment,
   };
 
   try {
@@ -292,7 +308,7 @@ app.post("/subscribe", async (req, res) => {
     if (err && err.code == "ER_DUP_ENTRY") {
       res.status(400).send({
         errMessage:
-          "Phone Number is already subscribed. Stay tuned for updates!",
+          "Le numéro de téléphone est déjà abonné. Restez à l'écoute des mises à jour !",
       });
     } else {
       res.status(400).send({
@@ -303,10 +319,9 @@ app.post("/subscribe", async (req, res) => {
 });
 
 // Used for updating the subscriber data
-app.post("/update-subscriber", async (req, res) => {
+app.post("/update-subscriber", verify, async (req, res) => {
   const {
     name,
-    address,
     phone_number,
     postal_code,
     quantity,
@@ -315,18 +330,24 @@ app.post("/update-subscriber", async (req, res) => {
     route_id,
     subscription_id,
     customer_id,
+    accept_alert,
+    street,
+    number,
+    apartment,
   } = req.body;
 
   const user = {
     name,
-    address,
     phone_number,
     postal_code,
     quantity,
-    status: 1,
-    created_date: new Date(),
+    updated_date: new Date(),
     email,
     route_id,
+    accept_alert,
+    street,
+    number,
+    apartment,
   };
 
   try {
@@ -399,7 +420,7 @@ app.post("/update-subscriber", async (req, res) => {
   }
 });
 
-app.get("/routes", async (req, res) => {
+app.get("/routes", verify, async (req, res) => {
   try {
     let data = await db
       .promise()
@@ -415,7 +436,7 @@ app.get("/routes", async (req, res) => {
 });
 
 // Used for fetching subscribers
-app.get("/customers", async (req, res) => {
+app.get("/customers", verify, async (req, res) => {
   try {
     let data = await db
       .promise()
@@ -457,14 +478,15 @@ app.post("/sendSMS", async (req, res) => {
 });
 
 // Used for broadcasting sms to all of the subscribers in a specific route
-app.post("/broadcast-sms", async (req, res) => {
+app.post("/broadcast-sms", verify, async (req, res) => {
   const { route, message } = req.body;
 
   const subscribers = await db
     .promise()
-    .query("SELECT * FROM subscribers WHERE route_id = ? ORDER BY id DESC", [
-      route,
-    ]);
+    .query(
+      "SELECT * FROM subscribers WHERE route_id = ? AND status = '1' ORDER BY id DESC",
+      [route]
+    );
 
   const routeData = await db
     .promise()
@@ -529,7 +551,7 @@ app.post("/create-checkout-session", async (req, res) => {
         proration_behavior: "none",
       },
       mode: "subscription",
-      success_url: `${process.env.APP_DOMAIN}/{CHECKOUT_SESSION_ID}__${req.body.userId}`,
+      success_url: `${process.env.APP_DOMAIN}/success/{CHECKOUT_SESSION_ID}__${req.body.userId}`,
       cancel_url: `${process.env.APP_DOMAIN}/sendSMS`,
     });
 
@@ -562,22 +584,22 @@ app.post("/cancel-subscription", async (req, res) => {
 });
 
 // Used for pausing subscription when the client reply no
-app.post("/pause-subscription", async (req, res) => {
-  try {
-    await stripe.subscriptions.update(req.body.subscription_id, {
-      pause_collection: {
-        behavior: "keep_as_draft",
-        resumes_at: utils.getStartDay(),
-      },
-    });
+// app.post("/pause-subscription", async (req, res) => {
+//   try {
+//     await stripe.subscriptions.update(req.body.subscription_id, {
+//       pause_collection: {
+//         behavior: "keep_as_draft",
+//         resumes_at: utils.getStartDay(),
+//       },
+//     });
 
-    res.status(200).json({ message: "Subscription successfully paused!" });
-  } catch (error) {
-    res.status(400).send({
-      errMessage: DEFAULT_ERROR_MESSAGE,
-    });
-  }
-});
+//     res.status(200).json({ message: "Subscription successfully paused!" });
+//   } catch (error) {
+//     res.status(400).send({
+//       errMessage: DEFAULT_ERROR_MESSAGE,
+//     });
+//   }
+// });
 
 // Used for setting value to subscription_id for reference
 app.post("/set-subscription", async (req, res) => {
@@ -598,12 +620,15 @@ app.post("/set-subscription", async (req, res) => {
       .promise()
       .query("SELECT * FROM subscribers where id = ?", [user_id]);
 
+    const successMessage =
+      "Bagels Round Top vous souhaite la bienvenue! Votre abonnement à nos bons bagels frais est matinenant activé. À bientôt!";
+
     await sendMessage(
       subscriber[0][0].phone_number,
-      "You have successfully subscribed to Bagels Round Top delivery. We'll be in touch with you regarding your delivery.\n\nThanks,\nBagels Round Top"
+      "Excellent! Vous êtes maintenant abonné à la livraison de bagels!"
     );
 
-    res.json({ subscriptionId: data.subscription });
+    res.json({ subscriptionId: data.subscription, message: successMessage });
   } catch (error) {
     res.status(400).send({
       errMessage: DEFAULT_ERROR_MESSAGE,
@@ -626,14 +651,16 @@ app.post("/unsubscribe", async (req, res) => {
     await db
       .promise()
       .query("UPDATE subscribers SET status = ? WHERE id = ? ", [
-        3,
+        2,
         subscriber[0][0].id,
       ]);
 
-    res.status(200).json({
-      message:
-        "You have successfully applied for unsubscription. Please respond to the confirmation text message sent to your mobile number.",
-    });
+    const message =
+      "Vous êtes désabonné des livraisons de bagels.  Passez quand même nous voir à la fabrique! 1 Principale Sud à Sutton";
+
+    await sendMessage(subscriber[0][0].phone_number, message);
+
+    res.status(200).json({ message });
   }
 });
 

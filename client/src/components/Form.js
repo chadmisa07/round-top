@@ -7,7 +7,9 @@ import {
   MenuItem,
   Button,
   Alert,
+  Checkbox,
 } from "@mui/material";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 const PACKS = [
   { value: 6, label: "Pack of 6" },
@@ -29,24 +31,29 @@ const Form = ({
 }) => {
   const {
     city,
-    address,
     name,
     phone_number,
     postal_code,
     quantity,
     email,
     route_id,
+    accept_alert,
+    street,
+    number,
+    apartment,
   } = initialState;
 
   const isDisabled =
     !city ||
-    !address ||
     !name ||
     !phone_number ||
     !postal_code ||
     !quantity ||
     !emailPattern.test(email) ||
-    isSubmitting;
+    isSubmitting ||
+    !street ||
+    !number ||
+    !accept_alert;
 
   return (
     <div>
@@ -70,7 +77,7 @@ const Form = ({
           <div className="my-4">
             <TextField
               fullWidth
-              label="Name"
+              label="Nom"
               name="name"
               color="secondary"
               onChange={handleChange}
@@ -80,7 +87,7 @@ const Form = ({
           <div className="my-4">
             <TextField
               fullWidth
-              label="City"
+              label="Ville"
               name="city"
               color="secondary"
               onChange={handleChange}
@@ -90,20 +97,50 @@ const Form = ({
           <div className="my-4">
             <TextField
               fullWidth
-              label="Address"
-              name="address"
+              label="Rue"
+              name="street"
               color="secondary"
               onChange={handleChange}
-              value={address}
+              value={street}
+            />
+          </div>
+          <div className="my-4">
+            <TextField
+              fullWidth
+              label="Numéro Civic"
+              name="number"
+              color="secondary"
+              onChange={handleChange}
+              value={number}
+            />
+          </div>
+          <div className="my-4">
+            <TextField
+              fullWidth
+              label="Appartement"
+              name="apartment"
+              color="secondary"
+              onChange={handleChange}
+              value={apartment}
+            />
+          </div>
+          <div className="my-4">
+            <TextField
+              fullWidth
+              label="Code Postal"
+              name="postal_code"
+              color="secondary"
+              onChange={handleChange}
+              value={postal_code}
             />
           </div>
           <div className="my-4">
             <FormControl fullWidth>
-              <InputLabel name="quantity-label">Quantity</InputLabel>
+              <InputLabel name="quantity-label">Quantité</InputLabel>
               <Select
                 labelId="quantity-label"
                 name="quantity"
-                label="quantity"
+                label="Quantité"
                 onChange={handleChange}
                 value={quantity}
               >
@@ -115,16 +152,7 @@ const Form = ({
               </Select>
             </FormControl>
           </div>
-          <div className="my-4">
-            <TextField
-              fullWidth
-              label="Postal Code"
-              name="postal_code"
-              color="secondary"
-              onChange={handleChange}
-              value={postal_code}
-            />
-          </div>
+
           <div className="my-4 flex justify-center w-full items-center">
             <div className="max-w-11">
               <div className="flex justify-center items-center border px-3 py-[15px] border-gray-300 rounded-l-[4px] bg-gray-200">
@@ -134,7 +162,7 @@ const Form = ({
             <TextField
               className="phone-number"
               fullWidth
-              label="Phone #"
+              label="Téléphone #"
               name="phone_number"
               color="secondary"
               onChange={handleChange}
@@ -144,18 +172,35 @@ const Form = ({
           <div className="my-4">
             <TextField
               fullWidth
-              label="Email"
+              label="E-mail"
               name="email"
               color="secondary"
               onChange={handleChange}
               value={email}
             />
           </div>
+
+          {!isUpdate && (
+            <div className="my-4">
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={accept_alert}
+                    onChange={handleChange}
+                    color="primary" // You can change the color to 'secondary' or 'default'
+                    name="accept_alert"
+                  />
+                }
+                label="J'accepte de recevoir des alertes de livraisons par texto"
+              />
+            </div>
+          )}
+
           {isUpdate ? (
             <>
               <div className="my-4">
                 <FormControl fullWidth>
-                  <InputLabel name="quantity-label">Route</InputLabel>
+                  <InputLabel name="quantity-label">Itinéraire</InputLabel>
                   <Select
                     labelId="route-label"
                     name="route_id"
@@ -174,8 +219,13 @@ const Form = ({
             </>
           ) : null}
           <div className="flex justify-center">
-            <Button type="submit" variant="contained" disabled={isDisabled}>
-              {isUpdate ? "Update" : "Subscribe"}
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={isDisabled}
+              className="!normal-case"
+            >
+              {isUpdate ? "Mise à jour" : "M'abonner"}
             </Button>
           </div>
         </form>

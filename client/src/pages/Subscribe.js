@@ -18,12 +18,15 @@ const Subscribe = () => {
   const { session_id } = params;
   const [inputs, setInputs] = useState({
     city: "",
-    address: "",
     name: "",
     phone_number: "",
     postal_code: "",
     quantity: "",
     email: "",
+    street: "",
+    number: "",
+    apartment: "",
+    accept_alert: false,
   });
   const [subscriptionId, setSubscriptionId] = useState("");
   const [success, setSuccess] = useState(false);
@@ -39,7 +42,8 @@ const Subscribe = () => {
 
   const handleChange = (event) => {
     const name = event.target.name;
-    const value = event.target.value;
+    const value =
+      name === "accept_alert" ? event.target.checked : event.target.value;
 
     if (name === "phone_number" && value && !/^[0-9]+$/.test(value)) return;
 
@@ -107,9 +111,7 @@ const Subscribe = () => {
 
         const data = await res.json();
         if (data?.subscriptionId) {
-          setSuccess(
-            "You have successfully subscribe to the bagels delivery weekly!"
-          );
+          setSuccess(data?.message);
           navigate("/");
         }
         setSubscriptionId(data.subscriptionId);
@@ -127,7 +129,6 @@ const Subscribe = () => {
         <UnsubscribeModal
           open={showUnsubscribeModal}
           handleClose={() => doShowUnsubscribeModal(false)}
-          setSuccess={setSuccess}
         />
       ) : null}
 
@@ -143,10 +144,9 @@ const Subscribe = () => {
           </div>
           <div className="bagels-form md:px-14 pb-6 px-6">
             <div className="flex items-center flex-col">
-              <h1 className="font-semibold text-2xl">
-                Subscribe to{" "}
-                <span className="font-bold">Bagels Round Top&nbsp;</span>
-                for a delivery
+              <h1 className="font-semibold text-2xl text-center">
+                Abonnez-vous à nos délicieux bagels, livrés frais du jour à
+                votre porte à toutes les semaines!
               </h1>
             </div>
 
@@ -162,12 +162,12 @@ const Subscribe = () => {
           <div className="flex ml-8 my-4 ">
             <div className="flex justify-center">
               <span className="text-sm">
-                Do you wish to&nbsp;
+                Souhaitez-vous vous&nbsp;
                 <span
                   onClick={() => doShowUnsubscribeModal(true)}
                   className="cursor-pointer font-semibold text-[blue]"
                 >
-                  unsubscribe
+                  désabonner
                 </span>
                 ?
               </span>

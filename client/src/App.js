@@ -2,9 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Subscribe from "./pages/Subscribe";
-// import Customers from "./pages/Customers";
-// import SendSMS from "./pages/SendSMS";
-// import BroadcastSMS from "./pages/BroadcastSMS";
+import Success from "./pages/Success";
 import Admin from "./pages/Admin";
 
 function App() {
@@ -12,7 +10,8 @@ function App() {
     <Router basename={process.env.REACT_APP_BASENAME || null}>
       <Routes>
         <Route path="/">
-          <Route exact path="/:session_id?" element={<Subscribe />} />
+          <Route exact path="/" element={<Subscribe />} />
+          <Route exact path="/success/:session_id?" element={<Success />} />
           {/* <Route exact path="/customers" element={<Customers />} />
           <Route exact path="/sendSMS" element={<SendSMS />} />
           <Route exact path="/broadcastSMS" element={<BroadcastSMS />} /> */}

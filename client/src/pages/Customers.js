@@ -14,25 +14,42 @@ import Grid from "@mui/material/Grid";
 
 import UserUpdateModal from "../components/UserUpdateModal";
 import CancelModal from "../components/admin/CancelModal";
+import Filters from "../components/admin/Filters";
 import Alert from "../components/Alert";
 
 function Form() {
   const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [user, setUser] = useState(null);
   const [routes, setRoutes] = useState([]);
   const [isCancel, setIsCancel] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
   const [error, setError] = useState(null);
+  const [filterByStatus, setFilterByStatus] = useState("0");
+  const [filterByRoute, setFilterByRoute] = useState("0");
+  const [sortBy, setSortBy] = useState("id");
 
   const doFetchCustomers = () => {
-    fetch(`${process.env.REACT_APP_DOMAIN}/customers`)
+    const brtJWT = localStorage.getItem("brt-jwt");
+    fetch(`${process.env.REACT_APP_DOMAIN}/customers`, {
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${brtJWT}`,
+      },
+    })
       .then((res) => res.text())
       .then((data) => {
         setData(JSON.parse(data));
+        setFilteredData(JSON.parse(data));
       })
       .catch((err) => setError(JSON.stringify(err)));
 
-    fetch(`${process.env.REACT_APP_DOMAIN}/routes`)
+    fetch(`${process.env.REACT_APP_DOMAIN}/routes`, {
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${brtJWT}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         setRoutes(data);
@@ -55,6 +72,53 @@ function Form() {
     setUser(null);
     setIsCancel(false);
   }, []);
+
+  useEffect(() => {
+    let newFilterData = data;
+    if (filterByRoute !== "0") {
+      newFilterData = newFilterData.filter(
+        (x) => x.route_id === Number(filterByRoute)
+      );
+    }
+
+    if (filterByStatus !== "0") {
+      newFilterData = newFilterData.filter(
+        (x) => x.status === Number(filterByStatus)
+      );
+    }
+
+    //Sort
+    function compareBy(a, b) {
+      const nameA = a[sortBy];
+      const nameB = b[sortBy];
+
+      if (nameA < nameB) {
+        return -1;
+      }
+      if (nameA > nameB) {
+        return 1;
+      }
+      return 0;
+    }
+
+    if (newFilterData.length) {
+      newFilterData = newFilterData.slice().sort(compareBy);
+    }
+
+    setFilteredData(newFilterData);
+  }, [filterByStatus, filterByRoute, sortBy, data]);
+
+  const doSetFilterByStatus = (filter) => {
+    setFilterByStatus(filter);
+  };
+
+  const doSetFilterByRoute = (filter) => {
+    setFilterByRoute(filter);
+  };
+
+  const doSetSortBy = (sort) => {
+    setSortBy(sort);
+  };
 
   return (
     <div>
@@ -82,9 +146,15 @@ function Form() {
           <Grid item xs={12}>
             <Alert error={error} containerClassName="mt-0 mb-2" />
             <TableContainer component={Paper}>
-              <Typography variant="h4" className="pl-4 pt-4">
+              <Typography variant="h4" className="p-4">
                 Customer List
               </Typography>
+              <Filters
+                doSetFilterByStatus={doSetFilterByStatus}
+                doSetFilterByRoute={doSetFilterByRoute}
+                doSetSortBy={doSetSortBy}
+                routes={routes}
+              />
               <Table sx={{ minWidth: 650 }} aria-label="simple table">
                 <TableHead>
                   <TableRow>
@@ -94,7 +164,10 @@ function Form() {
                     <TableCell className="!font-semibold">
                       Postal Code
                     </TableCell>
-                    <TableCell className="!font-semibold">Address</TableCell>
+                    <TableCell className="!font-semibold">City</TableCell>
+                    <TableCell className="!font-semibold">Number</TableCell>
+                    <TableCell className="!font-semibold">Street</TableCell>
+                    <TableCell className="!font-semibold">Apartment</TableCell>
                     <TableCell className="!font-semibold">Quantity</TableCell>
                     <TableCell className="!font-semibold">
                       Delivery Date
@@ -104,7 +177,7 @@ function Form() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {data.map((row) => {
+                  {filteredData.map((row) => {
                     const route = routes?.find(
                       (route) => route.id === row.route_id
                     );
@@ -122,7 +195,10 @@ function Form() {
                         <TableCell size="small">{row.phone_number}</TableCell>
                         <TableCell size="small">{row.status_desc}</TableCell>
                         <TableCell size="small">{row.postal_code}</TableCell>
-                        <TableCell size="small">{row.address}</TableCell>
+                        <TableCell size="small">{row.city}</TableCell>
+                        <TableCell size="small">{row.number}</TableCell>
+                        <TableCell size="small">{row.street}</TableCell>
+                        <TableCell size="small">{row.apartment}</TableCell>
                         <TableCell size="small">{row.quantity}</TableCell>
                         <TableCell size="small">
                           {route?.delivery_date_desc}

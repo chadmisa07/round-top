@@ -1,11 +1,13 @@
-import { Modal, Box, TextField, Button, Alert } from "@mui/material";
+import { Modal, Box, TextField, Button } from "@mui/material";
 import React, { useState } from "react";
 
+import Alert from "./Alert";
 import { modalStyle } from "./constants";
 
-const UnsubscribeModal = ({ open, handleClose, setSuccess }) => {
+const UnsubscribeModal = ({ open, handleClose }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
 
   const handlePhoneNumberChange = (value) => {
     if (value && !/^[0-9]+$/.test(value)) return;
@@ -19,14 +21,17 @@ const UnsubscribeModal = ({ open, handleClose, setSuccess }) => {
         "Content-Type": "application/json",
       },
       method: "POST",
-      body: JSON.stringify({ phoneNumber }),
+      body: JSON.stringify({
+        phoneNumber: `${process.env.REACT_APP_DEFAULT_AREA_CODE}${phoneNumber}`,
+      }),
     })
       .then((res) => res.json())
       .then((data) => {
         if (data.errMessage) setError(data.errMessage);
         if (data.message) {
-          handleClose();
           setSuccess(data.message);
+
+          setTimeout(() => handleClose(), 5000);
         }
       });
   };
@@ -34,18 +39,7 @@ const UnsubscribeModal = ({ open, handleClose, setSuccess }) => {
   return (
     <Modal open={open} onClose={handleClose} className="relative">
       <Box sx={modalStyle}>
-        <div className="my-4">
-          <Alert severity="info">
-            After submitting, please respond to a confirmation text message to
-            complete unsubscribing!
-          </Alert>
-        </div>
-
-        {error ? (
-          <div className="my-4">
-            <Alert severity="error">{error}</Alert>
-          </div>
-        ) : null}
+        <Alert error={error} success={success} />
 
         <div className="my-6 flex justify-center w-full">
           <div className="max-w-11">
@@ -56,7 +50,7 @@ const UnsubscribeModal = ({ open, handleClose, setSuccess }) => {
           <TextField
             className="phone-number"
             fullWidth
-            label="Phone #"
+            label="Téléphone #"
             name="phone_number"
             color="secondary"
             onChange={(e) => handlePhoneNumberChange(e.target.value)}
@@ -68,10 +62,11 @@ const UnsubscribeModal = ({ open, handleClose, setSuccess }) => {
           <Button
             type="submit"
             variant="contained"
-            disabled={!phoneNumber}
+            disabled={!phoneNumber || success || error}
             onClick={doUnsubscribe}
+            className="!normal-case"
           >
-            Unsubscribe
+            Désabonner
           </Button>
         </div>
       </Box>

@@ -20,7 +20,13 @@ function Form() {
   const [routes, setRoutes] = useState([]);
 
   const doFetchRoutes = () => {
-    fetch(`${process.env.REACT_APP_DOMAIN}/routes`)
+    const brtJWT = localStorage.getItem("brt-jwt");
+    fetch(`${process.env.REACT_APP_DOMAIN}/routes`, {
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${brtJWT}`,
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         setRoutes(data);

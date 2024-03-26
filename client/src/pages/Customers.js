@@ -141,12 +141,15 @@ function Form() {
         />
       ) : null}
 
-      <Box sx={{ paddingTop: 2, flexGrow: 1 }}>
+      <Box sx={{ paddingTop: 2, flexGrow: 1 }} className="shadow-lg border">
         <Grid container spacing={3}>
           <Grid item xs={12}>
             <Alert error={error} containerClassName="mt-0 mb-2" />
-            <TableContainer component={Paper}>
-              <Typography variant="h4" className="p-4">
+            <TableContainer
+              component={Paper}
+              className="!border-none !shadow-none"
+            >
+              <Typography variant="h4" className="p-4 customer-list-header">
                 Customer List
               </Typography>
               <Filters
@@ -160,7 +163,9 @@ function Form() {
                   <TableRow>
                     <TableCell className="!font-semibold">Name</TableCell>
                     <TableCell className="!font-semibold">Phone #</TableCell>
-                    <TableCell className="!font-semibold">Status</TableCell>
+                    <TableCell className="!font-semibold status-col">
+                      Status
+                    </TableCell>
                     <TableCell className="!font-semibold">
                       Postal Code
                     </TableCell>
@@ -173,70 +178,90 @@ function Form() {
                       Delivery Date
                     </TableCell>
                     <TableCell className="!font-semibold">Route</TableCell>
-                    <TableCell className="!font-semibold">Action</TableCell>
+                    <TableCell className="!font-semibold action-col">
+                      Action
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredData.map((row) => {
-                    const route = routes?.find(
-                      (route) => route.id === row.route_id
-                    );
+                  {filteredData?.length > 0 ? (
+                    <>
+                      {filteredData.map((row) => {
+                        const route = routes?.find(
+                          (route) => route.id === row.route_id
+                        );
 
-                    return (
-                      <TableRow
-                        key={row.id}
-                        sx={{
-                          "&:last-child td, &:last-child th": { border: 0 },
-                        }}
-                      >
-                        <TableCell component="th" scope="row">
-                          {row.name}
-                        </TableCell>
-                        <TableCell size="small">{row.phone_number}</TableCell>
-                        <TableCell size="small">{row.status_desc}</TableCell>
-                        <TableCell size="small">{row.postal_code}</TableCell>
-                        <TableCell size="small">{row.city}</TableCell>
-                        <TableCell size="small">{row.number}</TableCell>
-                        <TableCell size="small">{row.street}</TableCell>
-                        <TableCell size="small">{row.apartment}</TableCell>
-                        <TableCell size="small">{row.quantity}</TableCell>
-                        <TableCell size="small">
-                          {route?.delivery_date_desc}
-                        </TableCell>
-                        <TableCell size="small">{route?.name}</TableCell>
-                        <TableCell size="small">
-                          {row.status === 1 && (
-                            <Button
-                              type="button"
-                              variant="contained"
-                              onClick={() => {
-                                doSetUser(row);
-                                setIsUpdate(true);
-                              }}
-                            >
-                              Update
-                            </Button>
-                          )}
+                        return (
+                          <TableRow
+                            key={row.id}
+                            sx={{
+                              "&:last-child td, &:last-child th": { border: 0 },
+                            }}
+                          >
+                            <TableCell size="small">{row.name}</TableCell>
+                            <TableCell size="small">
+                              {row.phone_number}
+                            </TableCell>
+                            <TableCell size="small status-row">
+                              {row.status_desc}
+                            </TableCell>
+                            <TableCell size="small">
+                              {row.postal_code}
+                            </TableCell>
+                            <TableCell size="small">{row.city}</TableCell>
+                            <TableCell size="small">{row.number}</TableCell>
+                            <TableCell size="small">{row.street}</TableCell>
+                            <TableCell size="small">{row.apartment}</TableCell>
+                            <TableCell size="small">{row.quantity}</TableCell>
+                            <TableCell size="small">
+                              {route?.delivery_date_desc}
+                            </TableCell>
+                            <TableCell size="small">{route?.name}</TableCell>
+                            <TableCell size="small" className="action-row">
+                              <div className="flex flex-wrap gap-1">
+                                {row.status === 1 && (
+                                  <Button
+                                    type="button"
+                                    variant="contained"
+                                    onClick={() => {
+                                      doSetUser(row);
+                                      setIsUpdate(true);
+                                    }}
+                                  >
+                                    Update
+                                  </Button>
+                                )}
 
-                          {row.status !== 2 && (
-                            <span className="ml-2">
-                              <Button
-                                type="button"
-                                variant="contained"
-                                onClick={() => {
-                                  doSetUser(row);
-                                  setIsCancel(true);
-                                }}
-                                color="error"
-                              >
-                                Cancel
-                              </Button>
-                            </span>
-                          )}
+                                {row.status !== 2 && (
+                                  <span>
+                                    <Button
+                                      type="button"
+                                      variant="contained"
+                                      onClick={() => {
+                                        doSetUser(row);
+                                        setIsCancel(true);
+                                      }}
+                                      color="error"
+                                    >
+                                      Cancel
+                                    </Button>
+                                  </span>
+                                )}
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </>
+                  ) : (
+                    <>
+                      <TableRow>
+                        <TableCell colSpan={12} size="medium">
+                          <div className="text-center">No record found.</div>
                         </TableCell>
                       </TableRow>
-                    );
-                  })}
+                    </>
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>

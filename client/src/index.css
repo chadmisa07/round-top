@@ -2,6 +2,38 @@
 @tailwind components;
 @tailwind utilities;
 
+@media print {
+  @page {
+    size: landscape;
+  }
+}
+
+/* Styles for printing */
+@media print {
+  .sidebar,
+  .navbar {
+    display: none; /* Hide this element when printing */
+  }
+
+  table {
+    page-break-before: always;
+  }
+
+  .admin-container {
+    padding-left: 0px !important;
+    padding-right: 0px !important;
+  }
+
+  .filter-container,
+  .customer-list-header,
+  .status-row,
+  .status-col,
+  .action-row,
+  .action-col {
+    display: none !important;
+  }
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",

@@ -2,7 +2,14 @@ import React from "react";
 
 const Icon = () => {
   return (
-    <svg
+    <div>
+      <img
+        src={`${process.env.PUBLIC_URL}/icon-no-bg.png`}
+        width="40"
+        height="40"
+        alt="icon"
+      />
+      {/* <svg
       width="181.83500366210936px"
       height="42.07999954223632px"
       xmlns="http://www.w3.org/2000/svg"
@@ -31,7 +38,8 @@ const Icon = () => {
           ></path>
         </g>
       </g>
-    </svg>
+    </svg> */}
+    </div>
   );
 };
 

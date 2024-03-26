@@ -7,8 +7,6 @@ const CancelModal = ({ open, handleClose, doFetchCustomers, user }) => {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  console.log("@@@@@@@@@@@@@@ user >>>>>>>>>>>>>>>", user);
-
   const doUnsubscribe = async () => {
     setIsSubmitting(true);
     fetch(`${process.env.REACT_APP_DOMAIN}/cancel-subscription`, {

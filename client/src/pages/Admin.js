@@ -28,7 +28,7 @@ const AdminPage = () => {
   }, [brtJWT]);
 
   return (
-    <div>
+    <>
       {isLoading && brtJWT ? (
         <LoadingScreen />
       ) : (
@@ -40,7 +40,7 @@ const AdminPage = () => {
           )}
         </>
       )}
-    </div>
+    </>
   );
 };
 

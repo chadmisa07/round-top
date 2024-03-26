@@ -1,3 +1,4 @@
+import { Button } from "@mui/material";
 import React from "react";
 
 const Filters = ({
@@ -7,7 +8,7 @@ const Filters = ({
   routes,
 }) => {
   return (
-    <div className="flex items-center p-4 gap-x-4">
+    <div className="flex items-center p-4 gap-x-4 filter-container">
       <div>
         <span className="mr-1">Filter By Status:</span>
         <select
@@ -44,6 +45,15 @@ const Filters = ({
           <option value="city">City</option>
           <option value="street">Street</option>
         </select>
+      </div>
+      <div>
+        <Button
+          type="button"
+          variant="contained"
+          onClick={() => window.print()}
+        >
+          Print
+        </Button>
       </div>
     </div>
   );

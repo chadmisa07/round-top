@@ -4,8 +4,8 @@ import AccountButton from "./AccountButton";
 
 const Navbar = (props) => {
   return (
-    <nav className="bg-gray-900 sticky min-w-full">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="navbar bg-slate-600 sticky min-w-full">
+      <div className="mx-auto px-2 py-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <div className="flex-shrink-0">

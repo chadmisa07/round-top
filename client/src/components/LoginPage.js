@@ -42,7 +42,7 @@ const LoginPage = ({ doSetUser }) => {
       <div className="max-w-md w-full space-y-8 bg-white p-6 rounded-md shadow-xl">
         <div>
           <h2 className="text-center text-3xl font-extrabold text-gray-900">
-            Sign in to admin
+            Sign In
           </h2>
         </div>
         <Alert error={error} />

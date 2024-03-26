@@ -39,7 +39,6 @@ function Form() {
   }, []);
 
   const submitForm = (event) => {
-    console.log(inputs);
     event.preventDefault();
     setLoading(true);
     fetch(`${process.env.REACT_APP_DOMAIN}/broadcast-sms`, {
